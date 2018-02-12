@@ -1,3 +1,6 @@
+/* Author: Are Oelsner
+ * CMSC 335 Graphics Engine - Project 1
+ */
 ////////////////////////////////////////////////////////////////////////////////
 /// @file
 /// @brief Contains main function to create a window and run engine
@@ -33,11 +36,7 @@
 #include <GL/glx.h>
 #endif
 
-
-// GLM
-#include<glm/vec2.hpp>
-#include<glm/vec3.hpp>
-#include<glm/vec4.hpp>
+// GLM - included in Obj
 
 // My Files
 #include "Obj.h"
@@ -68,6 +67,9 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   std::chrono::high_resolution_clock::now()};
 float g_delay{0.f};
 float g_framesPerSecond{0.f};
+
+// 0 - Solid Model, 1 - Wireframe Model, 2 - Points
+int modelDisplay = 0;
 
 // Vertex Array Object, Vertex Buffer Object (vertices, normals, vertex indices, normal indices)
 GLuint vao, vbo[1], ebo[1];
@@ -150,16 +152,29 @@ draw() {
   gluLookAt(10*std::sin(m_camera.theta()), 0.f, 10*std::cos(m_camera.theta()),
       0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
- // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  // Changes Model Display Type based on keyboard input (UP Key)
+  switch(modelDisplay) {
+    case 0: 
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      break;
+    case 1:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      break;
+    case 2:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    default:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      break;
+  }
 
   glColor3f(0.6f, 0.f, 0.f);
 
   //////////////////////////////////////////////////////////////////////////////
   // TODO my code
-  glBindVertexArray(vao);
+//glBindVertexArray(vao);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
   glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
-  glDrawElements(GL_TRIANGLES, obj1.getNumVertices(), GL_UNSIGNED_INT, NULL);
+  glDrawElements(GL_TRIANGLES, obj1.getNumVertices(), GL_UNSIGNED_INT, 0);
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -211,6 +226,9 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
       m_camera.incTheta(0.02);
       break;
       // Unhandled
+    case GLUT_KEY_UP:
+      modelDisplay = (modelDisplay + 1) % 3;
+      break;
     default:
       std::cout << "Unhandled special key: " << _key << std::endl;
       break;
@@ -241,8 +259,8 @@ constructBuffers() {
   ////////////////////////////////////////////////////////////////////////////
   /// Vertex Array Object
   ////////////////////////////////////////////////////////////////////////////
-  glGenVertexArrays(1, &vao); 
-  glBindVertexArray(vao);     // Bind VAO
+//glGenVertexArrays(1, &vao); 
+//glBindVertexArray(vao);     // Bind VAO
 
 
   ////////////////////////////////////////////////////////////////////////////
