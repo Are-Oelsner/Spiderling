@@ -40,9 +40,6 @@ class Obj {
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
     bool loadOBJ(const char *filename);
 
-    //Prints vertices to console
-    void printVertices();
-
     //Getters
     vector<glm::vec3>* getVertices();
     vector<unsigned int>* getVertexIndices();

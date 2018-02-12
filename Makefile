@@ -48,7 +48,7 @@ $(EXECUTABLE): $(OBJS) $(OBJMOC)
 	$(CC) $(OPTS) $(FLAGS) $(DEFS) $(OBJS) $(LIBS) -o $(EXECUTABLE)
 
 clean:
-	rm -f $(EXECUTABLE) Dependencies $(OBJS)
+	rm -f $(EXECUTABLE) $(OBJS)
 
 .cpp.o:
 	$(CC) $(OPTS) $(DEFS) -MMD $(INCL) -c $< -o $@
