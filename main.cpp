@@ -151,8 +151,6 @@ draw() {
   glColor3f(0.6f, 0.f, 0.f);
 
   // TODO my code
-
-
   //glDrawElements(GL_TRIANGLES, ((*obj1.getVertices()).size())/3, GL_UNSIGNED_INT, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
   glDrawArrays(GL_TRIANGLES, 0, obj1.getVertices()->size());
@@ -236,9 +234,9 @@ main(int _argc, char** _argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowPosition(50, 100);
   glutInitWindowSize(m_window.width(), m_window.height()); // HD size
-  m_window.window(glutCreateWindow("Spiderling: A Rudamentary Game Engine"));
+  m_window.window(glutCreateWindow("Spiderling: A Rudimentary Game Engine"));
 
-  // Input Error
+u // Input Error
   if(_argc != 2) { 
     std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling filename.obj" << std::endl; 
   }
@@ -255,8 +253,10 @@ main(int _argc, char** _argv) {
   glutSpecialFunc(specialKeyPressed);
   glutTimerFunc(1000/FPS, timer, 0);
 
-  //look up buffer loading
+  
 
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct Buffers
   // Vertex Array Object
   glGenVertexArrays(1, &vao); 
   glBindVertexArray(vao);     // Bind VAO
@@ -266,7 +266,7 @@ main(int _argc, char** _argv) {
   glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind first vbo for vertices
   glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), obj1.getVertices(), GL_STATIC_DRAW); // Fill first vbo with vertices
 
-  //glVertexAttribPointer(...);
+  //glVertexAttribPointer(...); // TODO figure out what to do with this
   glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
   
   glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Bind second vbo for normals
@@ -281,8 +281,6 @@ main(int _argc, char** _argv) {
   //GLuint ibo;
   //glGenBuffers(1, &ibo);
   //glBindBuffer(GL_ARRAY_BUFFER, size
-
-
 
   // Start application
   std::cout << "Starting Application" << std::endl;
