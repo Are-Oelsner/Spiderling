@@ -42,6 +42,7 @@
 // My Files
 #include "Obj.h"
 #include "WindowClass.h"
+#include "Camera.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global variables - avoid these
@@ -51,10 +52,10 @@ WindowClass m_window;
 
 // Object from .obj file specified in argv[1]
 const char* objfile("cube.obj");
-Obj obj1(objfile);
+Obj obj1;
 
 // Camera
-float g_theta{0.f};
+Camera m_camera;
 
 // Frame rate
 const unsigned int FPS = 60;
@@ -142,7 +143,7 @@ draw() {
   // Camera
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(10*std::sin(g_theta), 0.f, 10*std::cos(g_theta),
+  gluLookAt(10*std::sin(m_camera.theta()), 0.f, 10*std::cos(m_camera.theta()),
       0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -151,9 +152,10 @@ draw() {
 
   //////////////////////////////////////////////////////////////////////////////
   // TODO my code
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); // Bind EBO
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
   //glBindBuffer(GL_ARRAY_BUFFER, vbo); // Bind VBO
-  glDrawElements(GL_TRIANGLES, obj1.getVertexIndices()->size(), GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, obj1.getVertexIndices()->size(), GL_UNSIGNED_INT, NULL);
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -199,10 +201,10 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   switch(_key) {
     // Arrow keys
     case GLUT_KEY_LEFT:
-      g_theta -= 0.02;
+      m_camera.incTheta(-0.02);
       break;
     case GLUT_KEY_RIGHT:
-      g_theta += 0.02;
+      m_camera.incTheta(0.02);
       break;
       // Unhandled
     default:
@@ -215,7 +217,53 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
 /// @brief constructBuffers
 void
 constructBuffers() {
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  /// Final Approach
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Element Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(1, ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
+  //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()) + sizeof(*obj1.getNormals()), NULL GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()), NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(*obj1.getVertices()), obj1.getVertices());
+  //glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Array Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenVertexArrays(1, &vao); 
+  glBindVertexArray(vao);     // Bind VAO
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(1, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()) + sizeof(*obj1.getNormals()), NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(*obj1.getVertices()), obj1.getVertices());
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*obj1.getVertices()));
+  glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
+  glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+
+
+
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
   /* Original Attempt
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  
   ////////////////////////////////////////////////////////////////////////////
   /// Element Buffer Object
   ////////////////////////////////////////////////////////////////////////////
@@ -262,43 +310,6 @@ constructBuffers() {
   glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
 
   */
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  // Alternatives
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-
-  ////////////////////////////////////////////////////////////////////////////
-  /// Element Buffer Object
-  ////////////////////////////////////////////////////////////////////////////
-  glGenBuffers(1, ebo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
-  //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()) + sizeof(*obj1.getNormals()), NULL GL_STATIC_DRAW);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()), NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(*obj1.getVertices()), obj1.getVertices());
-  //glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  /// Vertex Array Object
-  ////////////////////////////////////////////////////////////////////////////
-  glGenVertexArrays(1, &vao); 
-  glBindVertexArray(vao);     // Bind VAO
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  /// Vertex Buffer Object
-  ////////////////////////////////////////////////////////////////////////////
-  glGenBuffers(1, vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()) + sizeof(*obj1.getNormals()), NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(*obj1.getVertices()), obj1.getVertices());
-  glBufferSubData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*obj1.getVertices()));
-  glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
-  glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,7 +349,8 @@ main(int _argc, char** _argv) {
   glutSpecialFunc(specialKeyPressed);
   glutTimerFunc(1000/FPS, timer, 0);
 
-  
+  // Constructs Obj from .obj file. 
+  obj1.loadOBJ(_argv[1]); 
 
   //////////////////////////////////////////////////////////////////////////////
   // Construct Buffers

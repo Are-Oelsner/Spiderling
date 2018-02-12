@@ -32,9 +32,6 @@ class Obj {
     ////////////////////////////////////////////////////////////////////////////////
     /// @brief Loads obj file
     /// @param path file path to read from 
-    /// @param out_vertices references to obj vertices
-    /// @param out_uvs references to obj uvs
-    /// @param out_normals references to obj normals
     /// v : vertex, vt : texture coordinate (TODO), vn : vertex normal, f : face. 
     ///
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/

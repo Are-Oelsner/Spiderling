@@ -35,3 +35,18 @@ Obj.o: Obj.cpp Obj.h
 main.o: main.cpp Obj.h WindowClass.h
 Obj.o: Obj.cpp Obj.h
 main.o: main.cpp Obj.h WindowClass.h
+WindowClass.o: WindowClass.cpp WindowClass.h
+Obj.o: Obj.cpp Obj.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+WindowClass.o: WindowClass.cpp WindowClass.h
+Camera.o: Camera.cpp Camera.h
+Obj.o: Obj.cpp Obj.h
+Camera.o: Camera.cpp Camera.h
+WindowClass.o: WindowClass.cpp WindowClass.h
+Camera.o: Camera.cpp Camera.h
+Obj.o: Obj.cpp Obj.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h

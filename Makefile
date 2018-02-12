@@ -37,6 +37,7 @@ INCL = $(GL_INCL)
 LIBS = $(GL_LIBS)
 
 OBJS = WindowClass.o\
+			 Camera.o\
 			 Obj.o\
        main.o
 
