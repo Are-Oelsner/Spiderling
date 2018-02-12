@@ -110,29 +110,33 @@ loadOBJ(const char *filename) {
       normalIndexList.push_back(normalIndex[1]);
       normalIndexList.push_back(normalIndex[2]);
       numFaces++;
+      numVertexIndices += 3;
     }
   }
   /// Indexing
   // Vertex Indexing
   for(unsigned int i = 0; i < vertexIndexList.size(); i++) {
     unsigned int vertexIndex = vertexIndexList[i];
-    vertexIndices.push_back(vertexIndex); //TODO vertexIndex-1?
+    vertexIndices.push_back(vertexIndex-1); //TODO vertexIndex-1?
     printf("%u\n", vertexIndex);
   }
   // UV indexing
   for(unsigned int i = 0; i < uvIndexList.size(); i++) {
     unsigned int uvIndex = uvIndexList[i];
-    uvIndices.push_back(uvIndex);
+    uvIndices.push_back(uvIndex-1);
   }
   // Normal indexing
   for(unsigned int i = 0; i < normalIndexList.size(); i++) {
     unsigned int normalIndex = normalIndexList[i];
-    normalIndices.push_back(normalIndex); //TODO normalIndex-1?
+    normalIndices.push_back(normalIndex-1); //TODO normalIndex-1?
   }
 }
 
 void
 Obj::
 print() {
-  printf("#vertices: %u\n#uvs: %u\n#normals: %u\n", numVertices, numUVs, numNormals);
+  printf("#vertices: %u\n#uvs: %u\n#normals: %u\n#faces: %u\n#vertIndices: %u\n\n", numVertices, numUVs, numNormals, numFaces, numVertexIndices);
+  for(auto& i : vertexIndices) {
+    printf("%u\t%f\t%f\t%f\n", i, vertices.at(i)[0], vertices.at(i)[1], vertices.at(i)[2]);
+  }
 }

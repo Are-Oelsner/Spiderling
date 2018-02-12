@@ -68,9 +68,6 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
 float g_delay{0.f};
 float g_framesPerSecond{0.f};
 
-// 0 - Solid Model, 1 - Wireframe Model, 2 - Points
-int modelDisplay = 0;
-
 // Vertex Array Object, Vertex Buffer Object (vertices, normals, vertex indices, normal indices)
 GLuint vao, vbo[1], ebo[1];
 
@@ -152,29 +149,34 @@ draw() {
   gluLookAt(10*std::sin(m_camera.theta()), 0.f, 10*std::cos(m_camera.theta()),
       0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
-  // Changes Model Display Type based on keyboard input (UP Key)
-  switch(modelDisplay) {
-    case 0: 
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      break;
-    case 1:
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      break;
-    case 2:
-      glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-    default:
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      break;
-  }
-
   glColor3f(0.6f, 0.f, 0.f);
 
   //////////////////////////////////////////////////////////////////////////////
   // TODO my code
+  glBegin(GL_TRIANGLES);
+  int j = 0;
+  glm::vec3 tmp;
+  for(int i = 0; i < obj1.getNumVertexIndices(); i += 3) {        //For each triangle
+    tmp = obj1.getNormals()->at(obj1.getNormalIndices()->at(j));    //Triangle Normal
+    glNormal3f(tmp[0], tmp[1], tmp[2]);
+
+    tmp = obj1.getVertices()->at(obj1.getVertexIndices()->at(i));   //First point
+    glVertex3f(tmp[0], tmp[1], tmp[2]);
+    tmp = obj1.getVertices()->at(obj1.getVertexIndices()->at(i+1)); //Second Point
+    glVertex3f(tmp[0], tmp[1], tmp[2]);
+    tmp = obj1.getVertices()->at(obj1.getVertexIndices()->at(i+2)); //Third point
+    glVertex3f(tmp[0], tmp[1], tmp[2]);
+    j++;
+  }
+
+  glEnd();
+
+
+
 //glBindVertexArray(vao);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
-  glDrawElements(GL_TRIANGLES, obj1.getNumVertices(), GL_UNSIGNED_INT, 0);
+//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
+//glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
+//glDrawElements(GL_TRIANGLES, obj1.getNumVertices(), GL_UNSIGNED_INT, 0);
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -203,6 +205,18 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       glutDestroyWindow(m_window.window());
       m_window.window(0);
       break;
+    case 106:
+      std::cout << "Model Display: Filled" << std::endl;
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      break;
+    case 107:
+      std::cout << "Model Display: Wireframe" << std::endl;
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      break;
+    case 108:
+      std::cout << "Model Display: Points" << std::endl;
+      glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+      break;
       // Unhandled
     default:
       std::cout << "Unhandled key: " << (int)(_key) << std::endl;
@@ -226,9 +240,6 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
       m_camera.incTheta(0.02);
       break;
       // Unhandled
-    case GLUT_KEY_UP:
-      modelDisplay = (modelDisplay + 1) % 3;
-      break;
     default:
       std::cout << "Unhandled special key: " << _key << std::endl;
       break;

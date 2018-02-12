@@ -20,6 +20,7 @@ class Obj {
     vector<unsigned int> normalIndices;
 
   private:
+    unsigned int numVertexIndices = 0;
     unsigned int numVertices = 0;
     unsigned int numUVs = 0;
     unsigned int numNormals = 0;
@@ -57,6 +58,7 @@ class Obj {
     unsigned int getNumUVs() {return numUVs;}
     unsigned int getNumNormals() {return numNormals;}
     unsigned int getNumFaces() {return numFaces;}
+    unsigned int getNumVertexIndices() {return numVertexIndices;}
 };
 
 #endif
