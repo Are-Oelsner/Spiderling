@@ -75,18 +75,21 @@ loadOBJ(const char *filename) {
       glm::vec3 vertex;
       int tmp = fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
       vertices.push_back(vertex);
+      numVertices++;
     }
     // Vertex Textures -- Don't need for now TODO
     else if(strcmp(lineHeader, "vt") == 0) {
       glm::vec2 uv;
       int tmp = fscanf(file, "%f %f\n", &uv.x, &uv.y);
       uvs.push_back(uv);
+      numUVs++;
     }
     // Vertex Normals
     else if(strcmp(lineHeader, "vn") == 0) {
       glm::vec3 normal;
       int tmp = fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
       normals.push_back(normal);
+      numNormals++;
     }
     // Faces
     else if(strcmp(lineHeader, "f") == 0) {
@@ -106,6 +109,7 @@ loadOBJ(const char *filename) {
       normalIndexList.push_back(normalIndex[0]);
       normalIndexList.push_back(normalIndex[1]);
       normalIndexList.push_back(normalIndex[2]);
+      numFaces++;
     }
   }
   /// Indexing
@@ -125,4 +129,10 @@ loadOBJ(const char *filename) {
     unsigned int normalIndex = normalIndexList[i];
     normalIndices.push_back(normalIndex); //TODO normalIndex-1?
   }
+}
+
+void
+Obj::
+print() {
+  printf("#vertices: %u\n#uvs: %u\n#normals: %u\n", numVertices, numUVs, numNormals);
 }

@@ -12,7 +12,6 @@ using namespace std;
 class Obj {
   protected:
     ///Private Variables
-    // Vertices, should be read in triangles of three vertices. 
     vector<glm::vec3> vertices;
     vector<unsigned int> vertexIndices;
     vector<glm::vec2> uvs;
@@ -20,12 +19,19 @@ class Obj {
     vector<glm::vec3> normals;
     vector<unsigned int> normalIndices;
 
+  private:
+    unsigned int numVertices = 0;
+    unsigned int numUVs = 0;
+    unsigned int numNormals = 0;
+    unsigned int numFaces = 0;
+
   public:
     ///Constructors
     Obj() {}
     Obj(const char *filename);
 
     ~Obj();
+
 
     ///Functions
 
@@ -37,6 +43,8 @@ class Obj {
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
     bool loadOBJ(const char *filename);
 
+    void print();
+
     //Getters
     vector<glm::vec3>* getVertices();
     vector<unsigned int>* getVertexIndices();
@@ -44,6 +52,11 @@ class Obj {
     vector<unsigned int>* getUvIndices();
     vector<glm::vec3>* getNormals();
     vector<unsigned int>* getNormalIndices();
+
+    unsigned int getNumVertices() {return numVertices;}
+    unsigned int getNumUVs() {return numUVs;}
+    unsigned int getNumNormals() {return numNormals;}
+    unsigned int getNumFaces() {return numFaces;}
 };
 
 #endif
