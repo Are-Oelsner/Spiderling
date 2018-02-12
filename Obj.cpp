@@ -17,6 +17,11 @@ Obj::getVertices() {
   return &vertices;
 }
 
+vector<unsigned int>*
+Obj::getVertexIndices() {
+  return &vertexIndices;
+}
+
 vector<glm::vec2>*
 Obj::getUvs() {
   return &uvs;

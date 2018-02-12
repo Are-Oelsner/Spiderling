@@ -14,6 +14,7 @@ class Obj {
     ///Private Variables
     // Vertices, should be read in triangles of three vertices. 
     vector<glm::vec3> vertices;
+    vector<unsigned int> vertexIndices;
     vector<glm::vec2> uvs;
     vector<glm::vec3> normals;
 
@@ -42,6 +43,7 @@ class Obj {
 
     //Getters
     vector<glm::vec3>* getVertices();
+    vector<unsigned int>* getVertexIndices();
     vector<glm::vec2>* getUvs();
     vector<glm::vec3>* getNormals();
 };

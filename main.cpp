@@ -146,7 +146,6 @@ draw() {
       0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glBegin(GL_TRIANGLES);
 
   glColor3f(0.6f, 0.f, 0.f);
 
@@ -154,11 +153,6 @@ draw() {
   //glDrawElements(GL_TRIANGLES, ((*obj1.getVertices()).size())/3, GL_UNSIGNED_INT, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
   glDrawArrays(GL_TRIANGLES, 0, obj1.getVertices()->size());
-
-
-  // Where model of cube was
-
-  glEnd();
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -217,46 +211,9 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Main
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief main
-/// @param _argc Count of command line arguments
-/// @param _argv Command line arguments
-/// @return Application success status
-int
-main(int _argc, char** _argv) {
-  //////////////////////////////////////////////////////////////////////////////
-  // Initialize GLUT Window
-  std::cout << "Initializing GLUTWindow" << std::endl;
-  // GLUT
-  glutInit(&_argc, _argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-  glutInitWindowPosition(50, 100);
-  glutInitWindowSize(m_window.width(), m_window.height()); // HD size
-  m_window.window(glutCreateWindow("Spiderling: A Rudimentary Game Engine"));
-
-u // Input Error
-  if(_argc != 2) { 
-    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling filename.obj" << std::endl; 
-  }
-
-  // GL
-  initialize();
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Assign callback functions
-  std::cout << "Assigning Callback functions" << std::endl;
-  glutReshapeFunc(resize);
-  glutDisplayFunc(draw);
-  glutKeyboardFunc(keyPressed);
-  glutSpecialFunc(specialKeyPressed);
-  glutTimerFunc(1000/FPS, timer, 0);
-
-  
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Construct Buffers
+/// @brief constructBuffers
+void
+constructBuffers() {
   // Vertex Array Object
   glGenVertexArrays(1, &vao); 
   glBindVertexArray(vao);     // Bind VAO
@@ -281,6 +238,50 @@ u // Input Error
   //GLuint ibo;
   //glGenBuffers(1, &ibo);
   //glBindBuffer(GL_ARRAY_BUFFER, size
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Main
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief main
+/// @param _argc Count of command line arguments
+/// @param _argv Command line arguments
+/// @return Application success status
+int
+main(int _argc, char** _argv) {
+  //////////////////////////////////////////////////////////////////////////////
+  // Initialize GLUT Window
+  std::cout << "Initializing GLUTWindow" << std::endl;
+  // GLUT
+  glutInit(&_argc, _argv);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitWindowPosition(50, 100);
+  glutInitWindowSize(m_window.width(), m_window.height()); // HD size
+  m_window.window(glutCreateWindow("Spiderling: A Rudimentary Game Engine"));
+
+  // Input Error
+  if(_argc != 2) { 
+    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling filename.obj" << std::endl; 
+  }
+
+  // GL
+  initialize();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Assign callback functions
+  std::cout << "Assigning Callback functions" << std::endl;
+  glutReshapeFunc(resize);
+  glutDisplayFunc(draw);
+  glutKeyboardFunc(keyPressed);
+  glutSpecialFunc(specialKeyPressed);
+  glutTimerFunc(1000/FPS, timer, 0);
+
+  
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct Buffers
+  constructBuffers();
 
   // Start application
   std::cout << "Starting Application" << std::endl;
