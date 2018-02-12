@@ -68,3 +68,9 @@ pdf:
 
 r:
 	./spiderling cube.obj
+
+gdb:
+	gdb spiderling
+
+v:
+	valgrind spiderling

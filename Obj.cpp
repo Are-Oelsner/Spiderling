@@ -27,16 +27,25 @@ Obj::getUvs() {
   return &uvs;
 }
 
+vector<unsigned int>*
+Obj::getUvIndices() {
+  return &uvIndices;
+}
+
 vector<glm::vec3>*
 Obj::getNormals() {
   return &normals;
+}
+
+vector<unsigned int>*
+Obj::getNormalIndices() {
+  return &normalIndices;
 }
 
 bool 
 Obj::
 loadOBJ(const char *filename) {
   // Temp storage for contents of obj file
-  std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
   std::vector<glm::vec3> tmp_vertices;
   std::vector<glm::vec2> tmp_uvs;
   std::vector<glm::vec3> tmp_normals;
@@ -55,7 +64,8 @@ loadOBJ(const char *filename) {
     if(strcmp(lineHeader, "v") == 0) {
       glm::vec3 vertex;
       int tmp = fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
-      tmp_vertices.push_back(vertex);
+      vertices.push_back(vertex);
+      //tmp_vertices.push_back(vertex);
     }
     // Vertex Textures -- Don't need for now TODO
     else if(strcmp(lineHeader, "vt") == 0) {
@@ -67,7 +77,8 @@ loadOBJ(const char *filename) {
     else if(strcmp(lineHeader, "vn") == 0) {
       glm::vec3 normal;
       int tmp = fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-      tmp_normals.push_back(normal);
+      normals.push_back(normal);
+      //tmp_normals.push_back(normal);
     }
     // Faces
     else if(strcmp(lineHeader, "f") == 0) {
@@ -93,7 +104,9 @@ loadOBJ(const char *filename) {
     for(unsigned int i = 0; i < vertexIndices.size(); i++) {
       unsigned int vertexIndex = vertexIndices[i];
       glm::vec3 vertex = tmp_vertices[vertexIndex-1];
-      vertices.push_back(vertex);
+      tmp_vertices.push_back(vertex);
+      //vertices.push_back(vertex);
+      vertexIndices.push_back(vertexIndex-1); //TODO vertexIndex-1?
     }
     // UV indexing
     for(unsigned int i = 0; i < uvIndices.size(); i++) {
@@ -105,7 +118,9 @@ loadOBJ(const char *filename) {
     for(unsigned int i = 0; i < normalIndices.size(); i++) {
       unsigned int normalIndex = normalIndices[i];
       glm::vec3 normal = tmp_normals[normalIndex-1];
-      normals.push_back(normal);
+      tmp_normals.push_back(normal);
+      //normals.push_back(normal);
+      normalIndices.push_back(normalIndex-1); //TODO normalIndex-1?
     }
   }
 }

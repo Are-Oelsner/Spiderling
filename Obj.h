@@ -16,7 +16,9 @@ class Obj {
     vector<glm::vec3> vertices;
     vector<unsigned int> vertexIndices;
     vector<glm::vec2> uvs;
+    vector<unsigned int> uvIndices;
     vector<glm::vec3> normals;
+    vector<unsigned int> normalIndices;
 
   public:
     ///Constructors
@@ -45,7 +47,9 @@ class Obj {
     vector<glm::vec3>* getVertices();
     vector<unsigned int>* getVertexIndices();
     vector<glm::vec2>* getUvs();
+    vector<unsigned int>* getUvIndices();
     vector<glm::vec3>* getNormals();
+    vector<unsigned int>* getNormalIndices();
 };
 
 #endif

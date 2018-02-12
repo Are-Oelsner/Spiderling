@@ -64,8 +64,8 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
 float g_delay{0.f};
 float g_framesPerSecond{0.f};
 
-// Vertex Array Object and Vertex Buffer Object
-GLuint vao, vbo[2];
+// Vertex Array Object, Vertex Buffer Object (vertices, normals, vertex indices, normal indices)
+GLuint vao, vbo[1], ebo[1];
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,10 +149,11 @@ draw() {
 
   glColor3f(0.6f, 0.f, 0.f);
 
+  //////////////////////////////////////////////////////////////////////////////
   // TODO my code
-  //glDrawElements(GL_TRIANGLES, ((*obj1.getVertices()).size())/3, GL_UNSIGNED_INT, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
-  glDrawArrays(GL_TRIANGLES, 0, obj1.getVertices()->size());
+  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); // Bind EBO
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo); // Bind VBO
+  glDrawElements(GL_TRIANGLES, obj1.getVertexIndices()->size(), GL_UNSIGNED_INT, 0);
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -214,30 +215,90 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
 /// @brief constructBuffers
 void
 constructBuffers() {
-  // Vertex Array Object
-  glGenVertexArrays(1, &vao); 
-  glBindVertexArray(vao);     // Bind VAO
+  /* Original Attempt
+  ////////////////////////////////////////////////////////////////////////////
+  /// Element Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(2, ebo);
 
-  // Vertex Buffer Object
-  glGenBuffers(2, vbo);              // Make VBO for vertices and normals
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind first vbo for vertices
-  glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), obj1.getVertices(), GL_STATIC_DRAW); // Fill first vbo with vertices
-
-  //glVertexAttribPointer(...); // TODO figure out what to do with this
+  ////////////////////////////////////////////////////////////////////////////
+  // Vertex Indices
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind third vbo for vertex indices
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertexIndices()), obj1.getVertexIndices(), GL_STATIC_DRAW); // Fill second vbo with normals
+  //glVertexAttribPointer(...);
   glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
-  
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Bind second vbo for normals
-  glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getNormals()), obj1.getNormals(), GL_STATIC_DRAW); // Fill second vbo with normals
 
+  ////////////////////////////////////////////////////////////////////////////
+  // Normal Indices
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[1]); // Bind third vbo for normals
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getNormalIndices()), obj1.getNormalIndices(), GL_STATIC_DRAW); // Fill second vbo with normals
   //glVertexAttribPointer(...);
   glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
 
+  
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Array Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenVertexArrays(1, &vao); 
+  glBindVertexArray(vao);     // Bind VAO
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(2, vbo);              // Make VBO for vertices and normals
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Vertices
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind first vbo for vertices
+  glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), obj1.getVertices(), GL_STATIC_DRAW); // Fill first vbo with vertices
+  //glVertexAttribPointer(...); // TODO figure out what to do with this
+  glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
+  
+  ////////////////////////////////////////////////////////////////////////////
+  // Normals
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Bind third vbo for normals
+  glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getNormals()), obj1.getNormals(), GL_STATIC_DRAW); // Fill second vbo with normals
+  //glVertexAttribPointer(...);
+  glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+
+  */
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  // Alternatives
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Element Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(1, ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
+  //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()) + sizeof(*obj1.getNormals()), NULL GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()), NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(*obj1.getVertices()), obj1.getVertices());
+  //glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
 
 
-  //// Index Buffer Object TODO do I need this?
-  //GLuint ibo;
-  //glGenBuffers(1, &ibo);
-  //glBindBuffer(GL_ARRAY_BUFFER, size
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Array Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenVertexArrays(1, &vao); 
+  glBindVertexArray(vao);     // Bind VAO
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(1, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()) + sizeof(*obj1.getNormals()), NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(*obj1.getVertices()), obj1.getVertices());
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*obj1.getVertices()));
+  glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
+  glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

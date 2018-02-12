@@ -12,3 +12,11 @@ main.o: main.cpp Obj.h WindowClass.h
 main.o: main.cpp Obj.h WindowClass.h
 main.o: main.cpp Obj.h WindowClass.h
 main.o: main.cpp Obj.h WindowClass.h
+Obj.o: Obj.cpp Obj.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
+main.o: main.cpp Obj.h WindowClass.h
