@@ -146,8 +146,10 @@ draw() {
   // Camera
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(10*std::sin(m_camera.theta()), 0.f, 10*std::cos(m_camera.theta()),
+  gluLookAt(10*std::sin(m_camera.theta()), m_camera.getEyeY(), m_camera.getEyeZ()*std::cos(m_camera.theta()),
       0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
+//gluLookAt(10*std::sin(m_camera.theta()), 0.f, 10*std::cos(m_camera.theta()),
+//    0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
   glColor3f(0.6f, 0.f, 0.f);
 
@@ -217,6 +219,12 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       std::cout << "Model Display: Points" << std::endl;
       glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
       break;
+    case 111:
+      m_camera.incrementZ(0.5);
+      break;
+    case 105:
+      m_camera.incrementZ(-0.5);
+      break;
       // Unhandled
     default:
       std::cout << "Unhandled key: " << (int)(_key) << std::endl;
@@ -234,10 +242,16 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   switch(_key) {
     // Arrow keys
     case GLUT_KEY_LEFT:
-      m_camera.incTheta(-0.02);
+      m_camera.incTheta(-0.1);
       break;
     case GLUT_KEY_RIGHT:
-      m_camera.incTheta(0.02);
+      m_camera.incTheta(0.1);
+      break;
+    case GLUT_KEY_UP:
+      m_camera.incrementY(0.5);
+      break;
+    case GLUT_KEY_DOWN:
+      m_camera.incrementY(-0.5);
       break;
       // Unhandled
     default:

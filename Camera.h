@@ -5,6 +5,8 @@ class Camera {
   protected:
     ///Private Variables
     float g_theta;
+    double eyeY;
+    double eyeZ = 10;
 
   public:
     ///Constructors
@@ -20,6 +22,11 @@ class Camera {
 
     // Increments g_theta by inc
     void incTheta(float inc);
+
+    double getEyeY() {return eyeY;}
+    double getEyeZ() {return eyeZ;}
+    void incrementY(double inc) {eyeY += inc;}
+    void incrementZ(double inc) {eyeZ += inc;}
   
 
 };

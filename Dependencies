@@ -95,3 +95,12 @@ main.o: main.cpp Obj.h WindowClass.h Camera.h
 main.o: main.cpp Obj.h WindowClass.h Camera.h
 main.o: main.cpp Obj.h WindowClass.h Camera.h
 main.o: main.cpp Obj.h WindowClass.h Camera.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h
+Camera.o: Camera.cpp Camera.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h
+Camera.o: Camera.cpp Camera.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h
+main.o: main.cpp Obj.h WindowClass.h Camera.h
