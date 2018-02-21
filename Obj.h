@@ -9,9 +9,18 @@
 
 using namespace std;
 
+struct VEC6 { // VEC6 struct type made up of two glm::vec3s to store vertex + normal info
+  glm::vec3 vert;
+  glm::vec3 norm;
+  //int vertex_index
+};
+
 class Obj {
   protected:
     ///Private Variables
+    int mode = 3;   // 3 GL_TRIANGLES, 4 GL_QUADS
+    vector<VEC6> data;
+
     vector<glm::vec3> vertices;
     vector<unsigned int> vertexIndices;
     vector<glm::vec2> uvs;
@@ -44,9 +53,15 @@ class Obj {
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
     bool loadOBJ(const char *filename);
 
+    bool constructData();
+
+    void setMode(int m);
+
     void print();
 
     //Getters
+    vector<VEC6>* getData();
+
     vector<glm::vec3>* getVertices();
     vector<unsigned int>* getVertexIndices();
     vector<glm::vec2>* getUvs();

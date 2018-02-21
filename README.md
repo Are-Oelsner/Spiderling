@@ -11,3 +11,7 @@ left - rotate left
 right - rotate right
 up - move camera up
 down - move camera down
+
+
+TODO:
+fill new vector<VEC6> data in Obj with vec3 of vertex info and vec3 of associated normal info for each pair in the indexed list/ change the index to reference back to already created points/normals if the pairing is repeated

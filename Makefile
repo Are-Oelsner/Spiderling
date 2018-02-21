@@ -70,6 +70,9 @@ pdf:
 r:
 	./spiderling cube.obj
 
+s:
+	./spiderling Sting-Sword-lowpoly.obj
+
 gdb:
 	gdb spiderling
 

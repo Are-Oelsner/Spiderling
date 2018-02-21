@@ -7,6 +7,7 @@ using namespace std;
 Obj::
 Obj(const char *filename) {
   loadOBJ(filename);
+  constructData();
 }
 
 Obj::
@@ -15,6 +16,11 @@ Obj::
 
 ////////////////////////////////////////////////////////////////////////////////
 ///Functions
+vector<VEC6>*
+Obj::getData() {
+  return &data;
+}
+
 vector<glm::vec3>*
 Obj::getVertices() {
   return &vertices;
@@ -43,6 +49,12 @@ Obj::getNormals() {
 vector<unsigned int>*
 Obj::getNormalIndices() {
   return &normalIndices;
+}
+
+void
+Obj::
+setMode(int m) {
+  mode = m;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,22 +107,45 @@ loadOBJ(const char *filename) {
     else if(strcmp(lineHeader, "f") == 0) {
       std::string vertex1, vertex2, vertex3; //TODO what is this for?
       unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-      int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-      if(matches != 9) {
+      int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2], &vertexIndex[3], &uvIndex[3], &normalIndex[3]);
+      if((matches % 3) !=  0) {
         printf("Error: File cannot be read, an incorrect number of vertices, uvs, and normals was provided\n");
         return false;
       }
-      vertexIndexList.push_back(vertexIndex[0]);
-      vertexIndexList.push_back(vertexIndex[1]);
-      vertexIndexList.push_back(vertexIndex[2]);
-      uvIndexList.push_back(uvIndex[0]);
-      uvIndexList.push_back(uvIndex[1]);
-      uvIndexList.push_back(uvIndex[2]);
-      normalIndexList.push_back(normalIndex[0]);
-      normalIndexList.push_back(normalIndex[1]);
-      normalIndexList.push_back(normalIndex[2]);
-      numFaces++;
-      numVertexIndices += 3;
+
+      if(matches == 9) {
+        vertexIndexList.push_back(vertexIndex[0]);
+        vertexIndexList.push_back(vertexIndex[1]);
+        vertexIndexList.push_back(vertexIndex[2]);
+        uvIndexList.push_back(uvIndex[0]);
+        uvIndexList.push_back(uvIndex[1]);
+        uvIndexList.push_back(uvIndex[2]);
+        normalIndexList.push_back(normalIndex[0]);
+        normalIndexList.push_back(normalIndex[1]);
+        normalIndexList.push_back(normalIndex[2]);
+        numFaces++;
+        numVertexIndices += 3;
+        setMode(3);
+      }
+      else if(matches == 12) {
+        vertexIndexList.push_back(vertexIndex[0]);
+        vertexIndexList.push_back(vertexIndex[1]);
+        vertexIndexList.push_back(vertexIndex[2]);
+        vertexIndexList.push_back(vertexIndex[3]);
+        uvIndexList.push_back(uvIndex[0]);
+        uvIndexList.push_back(uvIndex[1]);
+        uvIndexList.push_back(uvIndex[2]);
+        uvIndexList.push_back(uvIndex[3]);
+        normalIndexList.push_back(normalIndex[0]);
+        normalIndexList.push_back(normalIndex[1]);
+        normalIndexList.push_back(normalIndex[2]);
+        normalIndexList.push_back(normalIndex[3]);
+        numFaces++;
+        numVertexIndices += 4;
+        setMode(4);
+      }
+
+
     }
   }
   /// Indexing
@@ -118,7 +153,6 @@ loadOBJ(const char *filename) {
   for(unsigned int i = 0; i < vertexIndexList.size(); i++) {
     unsigned int vertexIndex = vertexIndexList[i];
     vertexIndices.push_back(vertexIndex-1); //TODO vertexIndex-1?
-    printf("%u\n", vertexIndex);
   }
   // UV indexing
   for(unsigned int i = 0; i < uvIndexList.size(); i++) {
@@ -139,4 +173,15 @@ print() {
   for(auto& i : vertexIndices) {
     printf("%u\t%f\t%f\t%f\n", i, vertices.at(i)[0], vertices.at(i)[1], vertices.at(i)[2]);
   }
+}
+
+bool
+Obj::
+constructData() {
+  VEC6 tmp;
+    for(int i = 0; i < numVertexIndices; i++) {
+      tmp.vert = vertices[vertexIndices[i]];
+      tmp.norm = normals[normalIndices[i]];
+      data.push_back(tmp);
+    }
 }
