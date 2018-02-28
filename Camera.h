@@ -29,17 +29,16 @@ class Camera {
     //Getters
     float theta() {return g_theta;}
 
-    glm::vec3 at(int i) {if(i >= 0 && i <= 2) return eye[i];}
-    glm::vec3 c(int i) {if(i >= 0 && i <= 2) return center[i];}
-    glm::vec3 up(int i) {if(i >= 0 && i <= 2) return up[i];}
+    float at(int i) {if(i >= 0 && i <= 2) return eye[i];}
+    float c(int i) {if(i >= 0 && i <= 2) return center[i];}
+    float getUp(int i) {if(i >= 0 && i <= 2) return up[i];}
 
     // Incrementers
     void incTheta(float inc) {g_theta += inc;}
     void at(int i, double c) {eye[i] += c;}
     void c( int i, double c) {center[i] += c;}
-    void up(int i, double c) {up[i] += c;}
+    void upI(int i, double c) {up[i] += c;}
 
     // Look around functions
-    void DO THIS
 };
 #endif

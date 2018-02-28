@@ -149,24 +149,24 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
       break;
     case 111:       // o    zoom out
-      cam.at(0.5);
-      cam.cZ(0.5);
+      cam.at(2, 0.5);
+      cam.c(2, 0.5);
       break;
     case 105:       // i    zoom in
-      cam.eZ(-0.5);
-      cam.cZ(-0.5);
+      cam.at(2, -0.5);
+      cam.c(2, -0.5);
       break;
     case 119:       // w    look up
-      cam.cY(0.5);
+      cam.c(1, 0.5);
       break;
     case 115:       // s    look down
-      cam.cY(-0.5);
+      cam.c(1, -0.5);
       break;
     case 97:        // a    look left
-      cam.cX(-0.5);
+      cam.c(0, -0.5);
       break;
     case 100:       // d    look right
-      cam.cX(0.5);
+      cam.c(0, 0.5);
       break;
     case 114:       // r    reset camera
       cam.reset();
@@ -188,20 +188,20 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   switch(_key) {
     // Arrow keys
     case GLUT_KEY_LEFT:
-      cam.eX(-0.1);
-      cam.cX(-0.1);
+      cam.at(0, -0.1);
+      cam.c(0, -0.1);
       break;
     case GLUT_KEY_RIGHT:
-      cam.eX(0.1);
-      cam.cX(0.1);
+      cam.at(0, 0.1);
+      cam.c(0, 0.1);
       break;
     case GLUT_KEY_UP:
-      cam.eY(0.3);
-      cam.cY(0.3);
+      cam.at(1, 0.3);
+      cam.c(1, 0.3);
       break;
     case GLUT_KEY_DOWN:
-      cam.eY(-0.3);
-      cam.cY(-0.3);
+      cam.at(1, -0.3);
+      cam.c(1, -0.3);
       break;
       // Unhandled
     default:
@@ -219,7 +219,7 @@ constructBuffers() {
   ////////////////////////////////////////////////////////////////////////////
   glGenBuffers(1, ebo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*obj1.getIndices()->size(), obj1.getIndices()/*->data()*/, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*obj1.getIndices()->size(), obj1.getIndices()->data(), GL_STATIC_DRAW);
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -234,7 +234,7 @@ constructBuffers() {
   ////////////////////////////////////////////////////////////////////////////
   glGenBuffers(1, vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(double)*obj1.getrData()->size(), obj1.getrData()->data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*obj1.getData()->size(), obj1.getData()->data(), GL_STATIC_DRAW);
 
 
 
@@ -277,7 +277,7 @@ draw() {
   // Camera
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(cam.at(0), cam.at(1), cam.at(2), cam.c(0), cam.c(1), cam.c(2), cam.up(0), cam.up(1), cam.up(2)); //change to pan for center TODO
+  gluLookAt(cam.at(0), cam.at(1), cam.at(2), cam.c(0), cam.c(1), cam.c(2), cam.getUp(0), cam.getUp(1), cam.getUp(2)); //change to pan for center TODO
   //gluLookAt(cam.eX()*std::sin(cam.theta(), cam.eY(), cam.eZ()*std::cos(cam.theta()),
   //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
@@ -297,8 +297,8 @@ draw() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, sizeof(glm::vec3), NULL);
 
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT, /*sizeof(glm::vec3)*/ 0, /*(GLvoid*)sizeof(glm::vec3)*/ NULL);
+    //glEnableClientState(GL_NORMAL_ARRAY);
+    //glNormalPointer(GL_FLOAT, sizeof(glm::vec3), (GLvoid*)sizeof(glm::vec3));
 
     // For unindexed 
     glDrawArrays(GL_POINTS, 0, obj1.getData()->size());
@@ -309,18 +309,18 @@ draw() {
     //glBindVertexArray(vao);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
-    glEnableClientState(GL_INDEX_ARRAY);
+    //glEnableClientState(GL_INDEX_ARRAY);
 
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 6*sizeof(double), (GLvoid*)NULL);
+    glVertexPointer(3, GL_FLOAT, sizeof(VEC6), (GLvoid*)NULL);
 
     glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT, 6*sizeof(double), (GLvoid*)(3*sizeof(double)));
+    glNormalPointer(GL_FLOAT, sizeof(VEC6), (GLvoid*)(sizeof(glm::vec3)));
 
-    glDrawElements(GL_QUADS, obj1.getIndices()->size()/4, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_QUADS, obj1.getIndices()->size(), GL_UNSIGNED_INT, 0);
 
   }
 

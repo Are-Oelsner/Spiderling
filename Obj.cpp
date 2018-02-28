@@ -175,7 +175,7 @@ void
 Obj::
 print() {
   printf("vec3: %lu\tvec6: %lu\n\n", sizeof(glm::vec3), sizeof(VEC6));
-  printf("#vertices: %u\t#uvs: %u\t#normals: %u\n#faces: %u\t#vertIndices: %u\ndata: %lu\tindices:%lu\nrdata: %lu, %lu", numVertices, numUVs, numNormals, numFaces, numVertexIndices, data.size(), indices.size(), rdata.size(), rdata.size()*sizeof(double));
+  printf("#vertices: %u\t#uvs: %u\t#normals: %u\n#faces: %u\t#vertIndices: %u\ndata: %lu\tindices:%lu\n\n", numVertices, numUVs, numNormals, numFaces, numVertexIndices, data.size(), indices.size());
   for(int i = 0; i < indices.size(); i++) {
     printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);
   }
@@ -184,6 +184,7 @@ print() {
     printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", i, data[i].vert[0], data[i].norm[0], data[i].vert[1], data[i].norm[1], data[i].vert[2], data[i].norm[2]);
   }
 }
+
 bool
 Obj::
 constructData() {
@@ -197,12 +198,8 @@ constructData() {
     try{indexMap.at(ind);} catch (const std::out_of_range& oor) { 
       indexMap.emplace(ind, index);
       indices.push_back(index);   
-      rdata.push_back(vertices[ind.first][0]);
-      rdata.push_back(vertices[ind.first][1]);
-      rdata.push_back(vertices[ind.first][2]);
-      rdata.push_back(normals[ind.second][0]);
-      rdata.push_back(normals[ind.second][1]);
-      rdata.push_back(normals[ind.second][2]);
+      tmp.vert = vertices[ind.first];
+      tmp.norm = normals[ind.second];
       data.push_back(tmp);
       index++;
       continue;
@@ -211,27 +208,3 @@ constructData() {
 
   }
 }
-
-//bool
-//Obj::
-//constructData() {
-//  pair<unsigned int, unsigned int> ind; // pair of vertex index / corresponding normal index
-//  unsigned int index = 0;               // index of new indices 
-//  VEC6 tmp;                             // VEC6 of vertex/normal info to be pushed back to data
-//
-//  for(int i = 0; i < vertexIndices.size(); i++) {
-//    ind = pair<unsigned int, unsigned int>(vertexIndices[i], normalIndices[i]);
-//    // If pair is not already in list, adds it
-//    try{indexMap.at(ind);} catch (const std::out_of_range& oor) { 
-//      indexMap.emplace(ind, index);
-//      indices.push_back(index);   
-//      tmp.vert = vertices[ind.first];
-//      tmp.norm = normals[ind.second];
-//      data.push_back(tmp);
-//      index++;
-//      continue;
-//    }
-//    indices.push_back(indexMap.at(ind));
-//
-//  }
-//}

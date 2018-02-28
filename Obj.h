@@ -25,7 +25,6 @@ class Obj {
     // Final Data
     // Vertex-Normal Pairs
     vector<VEC6> data;
-    vector<double> rdata;
     // Final index list
     vector<unsigned int> indices;
 
@@ -76,7 +75,6 @@ class Obj {
 
     //Getters
     vector<VEC6>* getData();
-    vector<double>* getrData() {return &rdata;}
     vector<unsigned int>* getIndices();
 
     vector<glm::vec3>* getVertices();
