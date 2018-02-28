@@ -1,27 +1,21 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
+#include<glm/vec3.hpp>
+
 class Camera {
   protected:
     ///Private Variables
     float g_theta;
 
     // Specifies position of eye point
-    double eyeX;
-    double eyeY;
-    double eyeZ;
+    glm::vec3 eye;
 
     // Specifies poition of the reference point
-    double centerX;
-    double centerY;
-    double centerZ;
+    glm::vec3 center;
     
     // Specifies the direction of the up vector
-    double upX;
-    double upY;
-    double upZ;
-
-
+    glm::vec3 up;
 
   public:
     ///Constructors
@@ -35,32 +29,17 @@ class Camera {
     //Getters
     float theta() {return g_theta;}
 
-    double eX() {return eyeX;}
-    double eY() {return eyeY;}
-    double eZ() {return eyeZ;}
-
-    double cX() {return centerX;}
-    double cY() {return centerY;}
-    double cZ() {return centerZ;}
-    
-    double uX() {return upX;}
-    double uY() {return upY;}
-    double uZ() {return upZ;}
+    glm::vec3 at(int i) {if(i >= 0 && i <= 2) return eye[i];}
+    glm::vec3 c(int i) {if(i >= 0 && i <= 2) return center[i];}
+    glm::vec3 up(int i) {if(i >= 0 && i <= 2) return up[i];}
 
     // Incrementers
     void incTheta(float inc) {g_theta += inc;}
+    void at(int i, double c) {eye[i] += c;}
+    void c( int i, double c) {center[i] += c;}
+    void up(int i, double c) {up[i] += c;}
 
-    void eX(double c) {eyeX += c;}
-    void eY(double c) {eyeY += c;}
-    void eZ(double c) {eyeZ += c;}
-                         
-    void cX(double c) {centerX += c;}
-    void cY(double c) {centerY += c;}
-    void cZ(double c) {centerZ += c;}
-
-    void uX(double c) {upX += c;}
-    void uY(double c) {upY += c;}
-    void uZ(double c) {upZ += c;}
-
+    // Look around functions
+    void DO THIS
 };
 #endif
