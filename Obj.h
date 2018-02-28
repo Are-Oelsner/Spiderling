@@ -6,6 +6,8 @@
 #include <vector>
 #include <sstream>
 #include <string.h>
+#include <map>
+#include <stdexcept>
 
 using namespace std;
 
@@ -19,16 +21,28 @@ class Obj {
   protected:
     ///Private Variables
     int mode = 3;   // 3 GL_TRIANGLES, 4 GL_QUADS
-    vector<VEC6> data;
 
+    // Final Data
+    // Vertex-Normal Pairs
+    vector<VEC6> data;
+    // Final index list
+    vector<unsigned int> indices;
+
+    // Map with key as vertex/normal pair and value as index number
+    map<pair<unsigned int, unsigned int>, unsigned int> indexMap; 
+
+
+    // Original Data
     vector<glm::vec3> vertices;
-    vector<unsigned int> vertexIndices;
     vector<glm::vec2> uvs;
-    vector<unsigned int> uvIndices;
     vector<glm::vec3> normals;
+
+    // Original Indices
+    vector<unsigned int> vertexIndices;
+    vector<unsigned int> uvIndices;
     vector<unsigned int> normalIndices;
 
-  private:
+    // Stats
     unsigned int numVertexIndices = 0;
     unsigned int numVertices = 0;
     unsigned int numUVs = 0;
@@ -61,6 +75,7 @@ class Obj {
 
     //Getters
     vector<VEC6>* getData();
+    vector<unsigned int>* getIndices();
 
     vector<glm::vec3>* getVertices();
     vector<unsigned int>* getVertexIndices();

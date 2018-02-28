@@ -53,7 +53,7 @@ WindowClass m_window;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Camera
-Camera m_camera;
+Camera cam;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Object from .obj file specified by argv[1] in main
@@ -120,6 +120,137 @@ timer(int _v) {
     exit(0);
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief Callback function for keyboard presses
+/// @param _key Key
+/// @param _x X position of mouse
+/// @param _y Y position of mouse
+void
+keyPressed(GLubyte _key, GLint _x, GLint _y) {
+  switch(_key) {
+    // Escape key : quit application
+    case 27:
+      std::cout << "Destroying window: " << m_window.window() << std::endl;
+      glutDestroyWindow(m_window.window());
+      m_window.window(0);
+      break;
+    case 106:       // j    display filled shape
+      std::cout << "Model Display: Filled" << std::endl;
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      break;
+    case 107:       // k    display wireframe
+      std::cout << "Model Display: Wireframe" << std::endl;
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      break;
+    case 108:       // l    display points
+      std::cout << "Model Display: Points" << std::endl;
+      glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+      break;
+    case 111:       // o    zoom out
+      cam.eZ(0.5);
+      cam.cZ(0.5);
+      break;
+    case 105:       // i    zoom in
+      cam.eZ(-0.5);
+      cam.cZ(-0.5);
+      break;
+    case 119:       // w    look up
+      cam.cY(0.5);
+      break;
+    case 115:       // s    look down
+      cam.cY(-0.5);
+      break;
+    case 97:        // a    look left
+      cam.cX(-0.5);
+      break;
+    case 100:       // d    look right
+      cam.cX(0.5);
+      break;
+    case 114:       // r    reset camera
+      cam.reset();
+      break;
+      // Unhandled
+    default:
+      std::cout << "Unhandled key: " << (int)(_key) << std::endl;
+      break;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief Callback function for keyboard presses of special keys
+/// @param _key Key
+/// @param _x X position of mouse
+/// @param _y Y position of mouse
+void
+specialKeyPressed(GLint _key, GLint _x, GLint _y) {
+  switch(_key) {
+    // Arrow keys
+    case GLUT_KEY_LEFT:
+      cam.eX(-0.1);
+      cam.cX(-0.1);
+      break;
+    case GLUT_KEY_RIGHT:
+      cam.eX(0.1);
+      cam.cX(0.1);
+      break;
+    case GLUT_KEY_UP:
+      cam.eY(0.3);
+      cam.cY(0.3);
+      break;
+    case GLUT_KEY_DOWN:
+      cam.eY(-0.3);
+      cam.cY(-0.3);
+      break;
+      // Unhandled
+    default:
+      std::cout << "Unhandled special key: " << _key << std::endl;
+      break;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief constructBuffers
+void
+constructBuffers() {
+  ////////////////////////////////////////////////////////////////////////////
+  /// Element Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(1, ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*obj1.getIndices()->size(), obj1.getIndices(), GL_STATIC_DRAW);
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Array Object
+  ////////////////////////////////////////////////////////////////////////////
+  //glGenVertexArrays(1, &vao); 
+  //glBindVertexArray(vao);     // Bind VAO
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(1, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*obj1.getData()->size(), obj1.getData()->data(), GL_STATIC_DRAW);
+
+
+
+  //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*obj1.getData()->size(), obj1.getData()->data());
+
+  /// For without VAO
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+  //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
+  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*obj1.getVertices()));
+  //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief Draw function for single frame
 void
@@ -146,21 +277,54 @@ draw() {
   // Camera
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(10*std::sin(m_camera.theta()), m_camera.getEyeY(), m_camera.getEyeZ()*std::cos(m_camera.theta()),
-      0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
-  //gluLookAt(10*std::sin(m_camera.theta()), 0.f, 10*std::cos(m_camera.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
+  gluLookAt(cam.eX(), cam.eY(), cam.eZ(), cam.cX(), cam.cY(), cam.cZ(), cam.uX(), cam.uY(), cam.uZ()); //change to pan for center TODO
+  //gluLookAt(cam.eX()*std::sin(cam.theta(), cam.eY(), cam.eZ()*std::cos(cam.theta()),
+  //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
+
 
   glColor3f(0.6f, 0.f, 0.f);
-
-
-
   glPointSize(10);
-  //glBindVertexArray(vao);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
-  glDrawElements(GL_QUADS, obj1.getNumVertexIndices(), GL_UNSIGNED_INT, 0);
-  //glDrawArrays(GL_POINTS, 0, obj1.getNumVertices());
-  //glDrawArrays(GL_POINTS, 0, 3);
+
+  if(false) {
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, sizeof(glm::vec3), NULL);
+
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glNormalPointer(GL_FLOAT, /*sizeof(glm::vec3)*/ 0, /*(GLvoid*)sizeof(glm::vec3)*/ NULL);
+
+    // For unindexed 
+    glDrawArrays(GL_POINTS, 0, obj1.getData()->size());
+
+  }
+
+  else {
+
+    //glBindVertexArray(vao);
+
+   // glIndexPointer(3, GL_FLOAT, sizeof(glm::vec3), (GLvoid*)NULL);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, sizeof(glm::vec3), (GLvoid*)NULL);
+
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glNormalPointer(GL_FLOAT, sizeof(glm::vec3), (GLvoid*)sizeof(glm::vec3));
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
+    glEnableClientState(GL_INDEX_ARRAY);
+
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
+    //glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
+
+    // For indexed
+    glDrawElements(GL_QUADS, obj1.getIndices()->size()/4, GL_UNSIGNED_INT, 0);
+    // For unindexed 
+    //glDrawArrays(GL_POINTS, 0, obj1.getNumVertices());
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -175,115 +339,7 @@ draw() {
   //printf("FPS: %6.2f\n", g_framesPerSecond);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief Callback function for keyboard presses
-/// @param _key Key
-/// @param _x X position of mouse
-/// @param _y Y position of mouse
-void
-keyPressed(GLubyte _key, GLint _x, GLint _y) {
-  switch(_key) {
-    // Escape key : quit application
-    case 27:
-      std::cout << "Destroying window: " << m_window.window() << std::endl;
-      glutDestroyWindow(m_window.window());
-      m_window.window(0);
-      break;
-    case 106:
-      std::cout << "Model Display: Filled" << std::endl;
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      break;
-    case 107:
-      std::cout << "Model Display: Wireframe" << std::endl;
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      break;
-    case 108:
-      std::cout << "Model Display: Points" << std::endl;
-      glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-      break;
-    case 111:
-      m_camera.incrementZ(0.5);
-      break;
-    case 105:
-      m_camera.incrementZ(-0.5);
-      break;
-      // Unhandled
-    default:
-      std::cout << "Unhandled key: " << (int)(_key) << std::endl;
-      break;
-  }
-}
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief Callback function for keyboard presses of special keys
-/// @param _key Key
-/// @param _x X position of mouse
-/// @param _y Y position of mouse
-void
-specialKeyPressed(GLint _key, GLint _x, GLint _y) {
-  switch(_key) {
-    // Arrow keys
-    case GLUT_KEY_LEFT:
-      m_camera.incTheta(-0.1);
-      break;
-    case GLUT_KEY_RIGHT:
-      m_camera.incTheta(0.1);
-      break;
-    case GLUT_KEY_UP:
-      m_camera.incrementY(0.5);
-      break;
-    case GLUT_KEY_DOWN:
-      m_camera.incrementY(-0.5);
-      break;
-      // Unhandled
-    default:
-      std::cout << "Unhandled special key: " << _key << std::endl;
-      break;
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief constructBuffers
-void
-constructBuffers() {
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  /// Final Approach
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-
-  ////////////////////////////////////////////////////////////////////////////
-  /// Element Buffer Object
-  ////////////////////////////////////////////////////////////////////////////
-  glGenBuffers(1, ebo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*obj1.getVertices()), obj1.getVertices(), GL_STATIC_DRAW);
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  /// Vertex Array Object
-  ////////////////////////////////////////////////////////////////////////////
-  //glGenVertexArrays(1, &vao); 
-  //glBindVertexArray(vao);     // Bind VAO
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  /// Vertex Buffer Object
-  ////////////////////////////////////////////////////////////////////////////
-  glGenBuffers(1, vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*obj1.getVertices()->size() + sizeof(*obj1.getNormals()), NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3)*obj1.getVertices()->size(), obj1.getVertices()->data());
-  //glBufferData(GL_ARRAY_BUFFER, 36, data, GL_STATIC_DRAW);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, NULL);
-  //glBufferSubData(GL_ARRAY_BUFFER, 0, 36, data);
-  //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
-  //glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
-  //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
-  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*obj1.getVertices()));
-  //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main
@@ -324,6 +380,7 @@ main(int _argc, char** _argv) {
 
   // Constructs Obj from .obj file. 
   obj1.loadOBJ(_argv[1]); 
+  obj1.constructData();
   obj1.print();
 
   //////////////////////////////////////////////////////////////////////////////

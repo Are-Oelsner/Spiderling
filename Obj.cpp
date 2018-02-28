@@ -21,6 +21,11 @@ Obj::getData() {
   return &data;
 }
 
+vector<unsigned int>*
+Obj::getIndices() {
+  return &indices;
+}
+
 vector<glm::vec3>*
 Obj::getVertices() {
   return &vertices;
@@ -169,19 +174,37 @@ loadOBJ(const char *filename) {
 void
 Obj::
 print() {
-  printf("#vertices: %u\n#uvs: %u\n#normals: %u\n#faces: %u\n#vertIndices: %u\n\n", numVertices, numUVs, numNormals, numFaces, numVertexIndices);
-  for(auto& i : vertexIndices) {
-    printf("%u\t%f\t%f\t%f\n", i, vertices.at(i)[0], vertices.at(i)[1], vertices.at(i)[2]);
+  printf("vec3: %lu\tvec6: %lu\n\n", sizeof(glm::vec3), sizeof(VEC6));
+  printf("#vertices: %u\t#uvs: %u\t#normals: %u\n#faces: %u\t#vertIndices: %u\ndata: %lu\tindices:%lu\n", numVertices, numUVs, numNormals, numFaces, numVertexIndices, data.size(), indices.size());
+  for(int i = 0; i < indices.size(); i++) {
+    printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);
+  }
+  printf("Data: %lu\n", data.size());
+  for(int i = 0; i < data.size(); i++) {
+    printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", i, data[i].vert[0], data[i].norm[0], data[i].vert[1], data[i].norm[1], data[i].vert[2], data[i].norm[2]);
   }
 }
 
 bool
 Obj::
 constructData() {
-  VEC6 tmp;
-    for(int i = 0; i < numVertexIndices; i++) {
-      tmp.vert = vertices[vertexIndices[i]];
-      tmp.norm = normals[normalIndices[i]];
+  pair<unsigned int, unsigned int> ind; // pair of vertex index / corresponding normal index
+  unsigned int index = 0;               // index of new indices 
+  VEC6 tmp;                             // VEC6 of vertex/normal info to be pushed back to data
+
+  for(int i = 0; i < vertexIndices.size(); i++) {
+    ind = pair<unsigned int, unsigned int>(vertexIndices[i], normalIndices[i]);
+    // If pair is not already in list, adds it
+    try{indexMap.at(ind);} catch (const std::out_of_range& oor) { 
+      indexMap.emplace(ind, index);
+      indices.push_back(index);   
+      tmp.vert = vertices[ind.first];
+      tmp.norm = normals[ind.second];
       data.push_back(tmp);
+      index++;
+      continue;
     }
+    indices.push_back(indexMap.at(ind));
+
+  }
 }

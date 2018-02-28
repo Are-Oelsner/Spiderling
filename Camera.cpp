@@ -3,27 +3,32 @@
 Camera::
 Camera() {
   g_theta = 0.f;
-}
+  eyeX = 0;
+  eyeY = 10;
+  eyeZ = 30;
 
-Camera::
-Camera(float theta) {
-  g_theta = theta;
-}
+  centerX = 0;
+  centerY = 0;
+  centerZ = 0;
 
-float
-Camera::
-theta() {
-  return g_theta;
-}
-
-void
-Camera::
-theta(float theta) {
-  g_theta = theta;
+  upX = 0;
+  upY = 1;
+  upZ = 0;
 }
 
 void
 Camera::
-incTheta(float inc) {
-  g_theta += inc;
+reset() {
+  g_theta = 0.f;
+  eyeX = 0;
+  eyeY = 0;
+  eyeZ = 20;
+
+  centerX = 0;
+  centerY = 0;
+  centerZ = 0;
+
+  upX = 0;
+  upY = 1;
+  upZ = 0;
 }
