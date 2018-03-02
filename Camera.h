@@ -16,18 +16,15 @@ class Camera {
     float g_theta;
 
     // Specifies position of eye point
-    glm::vec4 eye;
+    glm::vec4 m_eye;
 
     // Specifies poition of the reference point
-    glm::vec4 center;
-    glm::vec4 c_offset;
-    glm::vec4 c_theta;
-    glm::mat4 mat;
-    glm::mat3 mat3;
-    // Specifies angle rotation from at to center
+    glm::vec4 m_at;
+
+    // Specifies angle rotation from eye to at
     
     // Specifies the direction of the up vector
-    glm::vec4 up;
+    glm::vec4 m_up;
     double PI = 3.1415926535897;
 
   public:
@@ -44,15 +41,15 @@ class Camera {
     //Getters
     float theta() {return g_theta;}
 
-    float at(int i) {if(i >= 0 && i <= 2) return eye[i];}
-    float c(int i) {if(i >= 0 && i <= 2) return center[i];}
-    float getUp(int i) {if(i >= 0 && i <= 2) return up[i];}
+    float eye(int i) {if(i >= 0 && i <= 2) return m_eye[i];}
+    float at(int i) {if(i >= 0 && i <= 2) return m_at[i];}
+    float getUp(int i) {if(i >= 0 && i <= 2) return m_up[i];}
 
     // Incrementers
     void incTheta(float inc) {g_theta += inc;}
-    void at(int i, double c);
-    void c( int i, double c) {center[i] += c;}
-    void upI(int i, double c) {up[i] += c;}
+    void eye(int i, double c);
+    void at( int i, double c) {m_at[i] += c;}
+    void upI(int i, double c) {m_up[i] += c;}
 
     // Look around functions
     void hLook(float angle);

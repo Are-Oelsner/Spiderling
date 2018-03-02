@@ -63,16 +63,19 @@ clean:
 ## My Stuff
 ################################################################################
 o:
-	vim -p main.cpp Obj.cpp WindowClass.cpp
+	vim -p main.cpp Obj.cpp Camera.cpp Vec.cpp
 
 pdf:
 	evince Project1.pdf
 
 r:
-	./spiderling 
+	./spiderling objs.dat 0
+
+r1:
+	./spiderling objs.dat 1
 
 s:
-	./spiderling Sting-Sword-lowpoly.obj
+	./spiderling obj1.dat 0
 
 gdb:
 	gdb spiderling

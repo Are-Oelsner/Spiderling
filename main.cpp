@@ -152,31 +152,31 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
       break;
     case 111:       // o    zoom out
+      cam.eye(2, 0.5);
       cam.at(2, 0.5);
-      cam.c(2, 0.5);
       break;
     case 105:       // i    zoom in
+      cam.eye(2, -0.5);
       cam.at(2, -0.5);
-      cam.c(2, -0.5);
       break;
     case 119:       // w    look up
-      cam.c(1, 0.5);
+      cam.at(1, 0.5);
       break;
     case 115:       // s    look down
-      cam.c(1, -0.5);
+      cam.at(1, -0.5);
       break;
     case 97:        // a    look left
-      cam.c(0, -0.5);
+      cam.at(0, -0.5);
       break;
     case 100:       // d    look right
-      cam.c(0, 0.5);
+      cam.at(0, 0.5);
       break;
     case 114:       // r    reset camera
       cam.reset();
       break;
-    case 116:       // t    test transform
-      cam.mTransform();
-      break;
+  //case 116:       // t    test transform
+  //  cam.mTransform();
+  //  break;
     case 117:       // u    test hLook
       cam.hLook(.1);
       break;
@@ -197,20 +197,20 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   switch(_key) {
     // Arrow keys
     case GLUT_KEY_LEFT:
+      cam.eye(0, -0.1);
       cam.at(0, -0.1);
-      cam.c(0, -0.1);
       break;
     case GLUT_KEY_RIGHT:
+      cam.eye(0, 0.1);
       cam.at(0, 0.1);
-      cam.c(0, 0.1);
       break;
     case GLUT_KEY_UP:
+      cam.eye(1, 0.3);
       cam.at(1, 0.3);
-      cam.c(1, 0.3);
       break;
     case GLUT_KEY_DOWN:
+      cam.eye(1, -0.3);
       cam.at(1, -0.3);
-      cam.c(1, -0.3);
       break;
       // Unhandled
     default:
@@ -226,37 +226,37 @@ constructBuffers() {
   glGenBuffers(objs.size(), ebo);
   glGenBuffers(objs.size(), vbo);
   for(int i = 0; i < objs.size(); i++) {
-  ////////////////////////////////////////////////////////////////////////////
-  /// Element Buffer Object
-  ////////////////////////////////////////////////////////////////////////////
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[i]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i].getIndices()->size(), objs[i].getIndices()->data(), GL_STATIC_DRAW);
+    ////////////////////////////////////////////////////////////////////////////
+    /// Element Buffer Object
+    ////////////////////////////////////////////////////////////////////////////
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[i]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i].getIndices()->size(), objs[i].getIndices()->data(), GL_STATIC_DRAW);
 
 
-  ////////////////////////////////////////////////////////////////////////////
-  /// Vertex Array Object
-  ////////////////////////////////////////////////////////////////////////////
-  //glGenVertexArrays(1, &vao); 
-  //glBindVertexArray(vao);     // Bind VAO
+    ////////////////////////////////////////////////////////////////////////////
+    /// Vertex Array Object
+    ////////////////////////////////////////////////////////////////////////////
+    //glGenVertexArrays(1, &vao); 
+    //glBindVertexArray(vao);     // Bind VAO
 
 
-  ////////////////////////////////////////////////////////////////////////////
-  /// Vertex Buffer Object
-  ////////////////////////////////////////////////////////////////////////////
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[i]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*objs[i].getData()->size(), objs[i].getData()->data(), GL_STATIC_DRAW);
+    ////////////////////////////////////////////////////////////////////////////
+    /// Vertex Buffer Object
+    ////////////////////////////////////////////////////////////////////////////
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[i]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*objs[i].getData()->size(), objs[i].getData()->data(), GL_STATIC_DRAW);
 
 
 
-  //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*objs[i].getData()->size(), objs[i].getData()->data());
+    //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*objs[i].getData()->size(), objs[i].getData()->data());
 
-  /// For without VAO
-  //glEnableClientState(GL_VERTEX_ARRAY);
-  //glVertexPointer(3, GL_FLOAT, 0, NULL);
+    /// For without VAO
+    //glEnableClientState(GL_VERTEX_ARRAY);
+    //glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-  //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i].getVertices()), sizeof(*objs[i].getNormals()) , objs[i].getNormals());
-  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i].getVertices()));
-  //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+    //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i].getVertices()), sizeof(*objs[i].getNormals()) , objs[i].getNormals());
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i].getVertices()));
+    //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
   }
 }
 
@@ -288,17 +288,28 @@ draw() {
   // Camera
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(cam.at(0), cam.at(1), cam.at(2), cam.c(0), cam.c(1), cam.c(2), cam.getUp(0), cam.getUp(1), cam.getUp(2)); //change to pan for center TODO
+  gluLookAt(cam.eye(0), cam.eye(1), cam.eye(2), cam.at(0), cam.at(1), cam.at(2), cam.getUp(0), cam.getUp(1), cam.getUp(2)); //change to pan for center TODO
   //gluLookAt(cam.eX()*std::sin(cam.theta(), cam.eY(), cam.eZ()*std::cos(cam.theta()),
   //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
 
-  glColor3f(0.6f, 0.f, 0.f);
+  //glColor3f(0.6f, 0.f, 0.f);
   glPointSize(10);
 
 
 
   for(int i = 0; i < objs.size(); i++) {
+    //glMatrixMode(GL_MODELVIEW);
+    //glLoadIdentity();
+    //float mat[16];
+    //glGetFloatv(GL_MODELVIEW_MATRIX, mat);
+    //printf("Modelview: \n%f\t%f\t%f\t%f\n%f\t%f\t%f\t%f\n%f\t%f\t%f\t%f\n%f\t%f\t%f\t%f\n\n", mat[0], mat[1], mat[2], mat[3], mat[4], mat[5], mat[6], mat[7], mat[8], mat[9], mat[10], mat[11], mat[12], mat[13], mat[14], mat[15]);
+
+    //glPushMatrix();
+    //glTranslatef((GLfloat) 0, (GLfloat) 0, (GLfloat) 0);
+
+    glColor3f(objs[i].getColor(0), objs[i].getColor(1), objs[i].getColor(2));
+
 
 
     //glBindVertexArray(vao);
@@ -315,12 +326,12 @@ draw() {
     glEnableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_FLOAT, sizeof(VEC6), (GLvoid*)(sizeof(glm::vec3)));
 
-    if(objs[i].getMode() == 4)
+    if(objs[i].getMode() == 4) 
       glDrawElements(GL_QUADS, objs[i].getIndices()->size(), GL_UNSIGNED_INT, 0);
-    else
+    else 
       glDrawElements(GL_TRIANGLES, objs[i].getIndices()->size(), GL_UNSIGNED_INT, 0);
+    //glPopMatrix();
   }
-
 
 
   //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
@@ -367,7 +378,7 @@ main(int _argc, char** _argv) {
   m_window.window(glutCreateWindow("Spiderling: A Rudimentary Game Engine"));
 
   // Input Error
-  if(_argc != 2) { 
+  if(_argc > 3) { 
     std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <0/1 debug>" << std::endl; 
   }
 
@@ -384,7 +395,7 @@ main(int _argc, char** _argv) {
   glutTimerFunc(1000/FPS, timer, 0);
 
   ifstream objFile;
-  objFile.open("objs.dat");
+  objFile.open(_argv[1]);
   string filename;
   Obj* obj;
   while(getline(objFile, filename)) {
@@ -394,6 +405,11 @@ main(int _argc, char** _argv) {
     objs.push_back(*obj);
   }
   objFile.close();
+
+  for(int i = 0; i < objs.size(); i++) {
+    objs[i].setPosition(glm::vec4(i*2, i*2, i*2, 1.));
+    objs[i].setColor((double)(rand()/(RAND_MAX)), (double)rand()/(RAND_MAX), (double)rand()/(RAND_MAX));
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   // Construct Buffers

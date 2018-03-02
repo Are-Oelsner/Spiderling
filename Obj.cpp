@@ -9,6 +9,9 @@ Obj(const char *filename) {
   loadOBJ(filename);
   constructData();
   initTransforms();
+  position = glm::vec4(0., 0., 0., 1.);
+  m_tran = glm::vec3(0., 0., 0.);
+  setColor(0, 0, 1);
 }
 
 Obj::
@@ -175,7 +178,7 @@ loadOBJ(const char *filename) {
 void
 Obj::
 print(bool debug) {
-  printf("#vertices: %u\t#uvs: %u\t#normals: %u\n#faces: %u\t#vertIndices: %u\ndata: %lu\tindices:%lu\n\n", numVertices, numUVs, numNormals, numFaces, numVertexIndices, data.size(), indices.size());
+  printf("mode: %u\t#vertices: %u\t#uvs: %u\t#normals: %u\n#faces: %u\t#vertIndices: %u\ndata: %lu\tindices:%lu\n\n", mode, numVertices, numUVs, numNormals, numFaces, numVertexIndices, data.size(), indices.size());
   if(debug) {
     for(int i = 0; i < indices.size(); i++) {
       printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);
@@ -214,7 +217,68 @@ constructData() {
 void
 Obj::
 initTransforms() {
-  position = Vec::constructIdentityMatrix();
-  orientation = Vec::constructIdentityMatrix();
-  scale = Vec::constructIdentityMatrix();
+  m_translation = Vec::constructIdentityMatrix();
+  m_rotation = Vec::constructIdentityMatrix();
+  m_scale = Vec::constructIdentityMatrix();
+}
+
+glm::vec4
+Obj::
+transform(float tx, float ty, float tz) {
+  float tdata[16] = {
+    1., 0., 0., tx,
+    0., 1., 0., ty,
+    0., 0., 1., tz,
+    0., 0., 0., 1.};
+  m_translation = glm::make_mat4(tdata);
+  m_tran = glm::vec3(tx, ty, tz);
+  return m_translation * position;
+}
+
+
+glm::vec4
+Obj::
+rotate(int i, float theta) {
+  float x1, x2, x3, y1, y2, y3, z1, z2, z3;
+  switch(i) {
+    case 0: { // X-axis
+              x1 = 1.;          x2 = 0.;          x3 = 0.;
+              y1 = 0.;          y2 = cos(theta);  y3 = sin(theta);
+              z1 = 0.;          z2 = -sin(theta); z3 = cos(theta);
+            }
+            break;
+    case 1: { // Y-axis
+              x1 = cos(theta);  x2 = 0.;          x3 = -sin(theta);
+              y1 = 0.;          y2 = 1.;          y3 = 0.;        
+              z1 = sin(theta);  z2 = 0.;          z3 = cos(theta);
+            }
+            break;
+    case 2: { // Z-axis
+              x1 = cos(theta);  x2 = -sin(theta); x3 = 0.;
+              y1 = sin(theta);  y2 = cos(theta);  y3 = 0.;        
+              z1 = 0.;          z2 = 0.;          z3 = 1.;
+            }
+            break;
+    default: printf("Error: rotation() i: %u\n", i);
+             break;
+  }
+  float rdata[16] = {
+    x1, x2, x3, 0.,
+    y1, y2, y3, 0.,
+    z1, z2, z3, 0.,
+    0., 0., 0., 1.};
+  m_rotation = glm::make_mat4(rdata);
+  return m_rotation * position;
+}
+
+glm::vec4
+Obj::
+scale(float sx, float sy, float sz) {
+  float sdata[16] = {
+    sx, 0., 0., 0.,
+    0., sy, 0., 0.,
+    0., 0., sz, 0.,
+    0., 0., 0., 1.};
+  m_scale = glm::make_mat4(sdata);
+  return m_scale * position;
 }

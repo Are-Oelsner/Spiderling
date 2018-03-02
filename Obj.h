@@ -34,9 +34,15 @@ class Obj {
     map<pair<unsigned int, unsigned int>, unsigned int> indexMap; 
 
     // Transformations
-    glm::mat4 position;
-    glm::mat4 orientation;
-    glm::mat4 scale;
+    glm::vec4 position;
+
+    glm::mat4 m_translation;
+    glm::mat4 m_rotation;
+    glm::mat4 m_scale;
+
+    glm::vec3 m_tran;
+
+    glm::vec4 m_color;
 
     ////////////////////////////////////////////////////////////////////////////////
     // Original Data
@@ -86,11 +92,25 @@ class Obj {
     vector<VEC6>* getData();
     vector<unsigned int>* getIndices();
 
-    glm::mat4* getPosition() {return &position;}
-    glm::mat4* getOrientation() {return &orientation;}
-    glm::mat4* getScale() {return &scale;}
+    glm::vec4* getPosition() {return &position;}
+    void setPosition(glm::vec4 vec) {position = vec;}
+
+    glm::mat4* getTranslation() {return &m_translation;}
+    glm::mat4* getRotation() {return &m_rotation;}
+    glm::mat4* getScale() {return &m_scale;}
+
+    glm::vec3* getTran() {return &m_tran;}
+
+    glm::vec4 transform(float tx, float ty, float tz);
+    glm::vec4 rotate(int i, float theta);
+    glm::vec4 scale(float sx, float sy, float sz);
 
     int getMode() {return mode;}
+
+    glm::vec4 getColor() {return m_color;}
+    float getColor(int i) {return m_color[i];}
+    void setColor(float r, float g, float b) {m_color = glm::vec4(r, g, b, 0);}
+    void setColor(glm::vec4 color) {m_color = color;}
 
 
   protected:
