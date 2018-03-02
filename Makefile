@@ -39,6 +39,7 @@ LIBS = $(GL_LIBS)
 OBJS = WindowClass.o\
 			 Camera.o\
 			 Obj.o\
+			 Vec.o\
        main.o
 
 EXECUTABLE = spiderling
@@ -68,7 +69,7 @@ pdf:
 	evince Project1.pdf
 
 r:
-	./spiderling cube.obj
+	./spiderling 
 
 s:
 	./spiderling Sting-Sword-lowpoly.obj

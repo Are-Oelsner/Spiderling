@@ -8,6 +8,7 @@ Obj::
 Obj(const char *filename) {
   loadOBJ(filename);
   constructData();
+  initTransforms();
 }
 
 Obj::
@@ -173,19 +174,20 @@ loadOBJ(const char *filename) {
 
 void
 Obj::
-print() {
-  printf("vec3: %lu\tvec6: %lu\n\n", sizeof(glm::vec3), sizeof(VEC6));
+print(bool debug) {
   printf("#vertices: %u\t#uvs: %u\t#normals: %u\n#faces: %u\t#vertIndices: %u\ndata: %lu\tindices:%lu\n\n", numVertices, numUVs, numNormals, numFaces, numVertexIndices, data.size(), indices.size());
-  for(int i = 0; i < indices.size(); i++) {
-    printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);
-  }
-  printf("Data: %lu\n", data.size());
-  for(int i = 0; i < data.size(); i++) {
-    printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", i, data[i].vert[0], data[i].norm[0], data[i].vert[1], data[i].norm[1], data[i].vert[2], data[i].norm[2]);
+  if(debug) {
+    for(int i = 0; i < indices.size(); i++) {
+      printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);
+    }
+    printf("Data: %lu\n", data.size());
+    for(int i = 0; i < data.size(); i++) {
+      printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", i, data[i].vert[0], data[i].norm[0], data[i].vert[1], data[i].norm[1], data[i].vert[2], data[i].norm[2]);
+    }
   }
 }
 
-bool
+void
 Obj::
 constructData() {
   pair<unsigned int, unsigned int> ind; // pair of vertex index / corresponding normal index
@@ -207,4 +209,12 @@ constructData() {
     indices.push_back(indexMap.at(ind));
 
   }
+}
+
+void
+Obj::
+initTransforms() {
+  position = Vec::constructIdentityMatrix();
+  orientation = Vec::constructIdentityMatrix();
+  scale = Vec::constructIdentityMatrix();
 }

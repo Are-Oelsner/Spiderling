@@ -1,7 +1,14 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
-#include<glm/vec3.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <iostream>
+
+#include "Vec.h"
+
 
 class Camera {
   protected:
@@ -9,13 +16,19 @@ class Camera {
     float g_theta;
 
     // Specifies position of eye point
-    glm::vec3 eye;
+    glm::vec4 eye;
 
     // Specifies poition of the reference point
-    glm::vec3 center;
+    glm::vec4 center;
+    glm::vec4 c_offset;
+    glm::vec4 c_theta;
+    glm::mat4 mat;
+    glm::mat3 mat3;
+    // Specifies angle rotation from at to center
     
     // Specifies the direction of the up vector
-    glm::vec3 up;
+    glm::vec4 up;
+    double PI = 3.1415926535897;
 
   public:
     ///Constructors
@@ -23,6 +36,8 @@ class Camera {
     
     ///Functions
     void reset();
+
+    void mTransform();
     //Setters
     void theta(float theta);
 
@@ -35,10 +50,12 @@ class Camera {
 
     // Incrementers
     void incTheta(float inc) {g_theta += inc;}
-    void at(int i, double c) {eye[i] += c;}
+    void at(int i, double c);
     void c( int i, double c) {center[i] += c;}
     void upI(int i, double c) {up[i] += c;}
 
     // Look around functions
+    void hLook(float angle);
+    void vLook(float angle);
 };
 #endif

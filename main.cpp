@@ -17,6 +17,7 @@
 #include <cmath>
 #include <chrono>
 #include <iostream>
+#include <fstream>
 
 #include <string>
 #include <string.h>
@@ -57,7 +58,7 @@ Camera cam;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Object from .obj file specified by argv[1] in main
-Obj obj1;
+vector<Obj> objs;
 
 
 // Frame rate
@@ -70,6 +71,8 @@ float g_framesPerSecond{0.f};
 
 // Vertex Array Object, Vertex Buffer Object (vertices, normals, vertex indices, normal indices)
 GLuint vao, vbo[1], ebo[1];
+//vector<GLuint> vbo;
+//vector<GLuint> ebo;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +174,12 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
     case 114:       // r    reset camera
       cam.reset();
       break;
+    case 116:       // t    test transform
+      cam.mTransform();
+      break;
+    case 117:       // u    test hLook
+      cam.hLook(.1);
+      break;
       // Unhandled
     default:
       std::cout << "Unhandled key: " << (int)(_key) << std::endl;
@@ -214,12 +223,14 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
 /// @brief constructBuffers
 void
 constructBuffers() {
+  glGenBuffers(objs.size(), ebo);
+  glGenBuffers(objs.size(), vbo);
+  for(int i = 0; i < objs.size(); i++) {
   ////////////////////////////////////////////////////////////////////////////
   /// Element Buffer Object
   ////////////////////////////////////////////////////////////////////////////
-  glGenBuffers(1, ebo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*obj1.getIndices()->size(), obj1.getIndices()->data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[i]);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i].getIndices()->size(), objs[i].getIndices()->data(), GL_STATIC_DRAW);
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -232,21 +243,21 @@ constructBuffers() {
   ////////////////////////////////////////////////////////////////////////////
   /// Vertex Buffer Object
   ////////////////////////////////////////////////////////////////////////////
-  glGenBuffers(1, vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*obj1.getData()->size(), obj1.getData()->data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[i]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*objs[i].getData()->size(), objs[i].getData()->data(), GL_STATIC_DRAW);
 
 
 
-  //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*obj1.getData()->size(), obj1.getData()->data());
+  //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*objs[i].getData()->size(), objs[i].getData()->data());
 
   /// For without VAO
   //glEnableClientState(GL_VERTEX_ARRAY);
   //glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-  //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*obj1.getVertices()), sizeof(*obj1.getNormals()) , obj1.getNormals());
-  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*obj1.getVertices()));
+  //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i].getVertices()), sizeof(*objs[i].getNormals()) , objs[i].getNormals());
+  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i].getVertices()));
   //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+  }
 }
 
 
@@ -287,50 +298,37 @@ draw() {
 
 
 
-
-  bool debug = false;
-
-  if(debug) {
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, sizeof(glm::vec3), NULL);
-
-    //glEnableClientState(GL_NORMAL_ARRAY);
-    //glNormalPointer(GL_FLOAT, sizeof(glm::vec3), (GLvoid*)sizeof(glm::vec3));
-
-    // For unindexed 
-    glDrawArrays(GL_POINTS, 0, obj1.getData()->size());
-  }
-  else {
+  for(int i = 0; i < objs.size(); i++) {
 
 
     //glBindVertexArray(vao);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]); // Bind EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[i]); // Bind EBO
     //glEnableClientState(GL_INDEX_ARRAY);
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Bind VBO
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[i]); // Bind VBO
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, sizeof(VEC6), (GLvoid*)NULL);
+    glVertexPointer(objs[i].getMode(), GL_FLOAT, sizeof(VEC6), (GLvoid*)NULL);
 
     glEnableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_FLOAT, sizeof(VEC6), (GLvoid*)(sizeof(glm::vec3)));
 
-    glDrawElements(GL_QUADS, obj1.getIndices()->size(), GL_UNSIGNED_INT, 0);
-
+    if(objs[i].getMode() == 4)
+      glDrawElements(GL_QUADS, objs[i].getIndices()->size(), GL_UNSIGNED_INT, 0);
+    else
+      glDrawElements(GL_TRIANGLES, objs[i].getIndices()->size(), GL_UNSIGNED_INT, 0);
   }
 
 
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
-    //glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
-    
-    //glDrawRangeElements(GL_QUADS, 0, obj1.getIndices()->size()-1, obj1.getIndices()->size()/4, GL_UNSIGNED_INT, 0);
-    // For unindexed 
-    //glDrawArrays(GL_POINTS, 0, obj1.getNumVertices());
+
+  //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);//TODO may not be GL_FLOAT since glm::vec3
+  //glEnableVertexAttribArray(0); // Enables attribute index 0 as being used
+
+  //glDrawRangeElements(GL_QUADS, 0, objs[i].getIndices()->size()-1, objs[i].getIndices()->size()/4, GL_UNSIGNED_INT, 0);
+  // For unindexed 
+  //glDrawArrays(GL_POINTS, 0, objs[i].getNumVertices());
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -370,7 +368,7 @@ main(int _argc, char** _argv) {
 
   // Input Error
   if(_argc != 2) { 
-    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling filename.obj" << std::endl; 
+    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <0/1 debug>" << std::endl; 
   }
 
   // GL
@@ -385,10 +383,17 @@ main(int _argc, char** _argv) {
   glutSpecialFunc(specialKeyPressed);
   glutTimerFunc(1000/FPS, timer, 0);
 
-  // Constructs Obj from .obj file. 
-  obj1.loadOBJ(_argv[1]); 
-  obj1.constructData();
-  obj1.print();
+  ifstream objFile;
+  objFile.open("objs.dat");
+  string filename;
+  Obj* obj;
+  while(getline(objFile, filename)) {
+    obj = new Obj(filename.c_str());
+    printf("Object: %s\n", filename.c_str());
+    obj->print(atoi(_argv[2]));
+    objs.push_back(*obj);
+  }
+  objFile.close();
 
   //////////////////////////////////////////////////////////////////////////////
   // Construct Buffers
