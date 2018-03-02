@@ -93,7 +93,9 @@ class Obj {
     vector<unsigned int>* getIndices();
 
     glm::vec4* getPosition() {return &position;}
+    float getPosition(int i) {return position[i];}
     void setPosition(glm::vec4 vec) {position = vec;}
+    void setPosition(float x, float y, float z) {position = glm::vec4(x, y, z, 1);}
 
     glm::mat4* getTranslation() {return &m_translation;}
     glm::mat4* getRotation() {return &m_rotation;}

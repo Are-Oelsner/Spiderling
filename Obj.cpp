@@ -11,7 +11,7 @@ Obj(const char *filename) {
   initTransforms();
   position = glm::vec4(0., 0., 0., 1.);
   m_tran = glm::vec3(0., 0., 0.);
-  setColor(0, 0, 1);
+  setColor(.4, rand(), 0);
 }
 
 Obj::

@@ -21,3 +21,7 @@ write functions for looking left and write, keeping cam.center the same distance
 Fix buffer problem...
 
 Figure out hLook and vLook functions for keeping the center the same distance away as you look around
+
+Have Obj store associated ebo and vbo and have draw function.
+
+change from pointers to const reference

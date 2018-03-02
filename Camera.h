@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <cmath>
 
 #include "Vec.h"
 
@@ -21,6 +22,7 @@ class Camera {
 
     // Specifies poition of the reference point
     glm::vec4 m_at;
+    glm::vec4 c_theta;
 
     // Specifies angle rotation from eye to at
     
@@ -49,7 +51,7 @@ class Camera {
 
     // Incrementers
     void incTheta(float inc) {g_theta += inc;}
-    void eye(int i, double c);
+    void eye(int i, double c) {m_eye[i] += c;}
     void at( int i, double c) {m_at[i] += c;}
     void upI(int i, double c) {m_up[i] += c;}
 
