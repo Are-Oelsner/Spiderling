@@ -101,7 +101,7 @@ class Obj {
 
     glm::vec3* getTran() {return &m_tran;}
 
-    glm::vec4 transform(float tx, float ty, float tz);
+    glm::vec4 translate(float tx, float ty, float tz);
     glm::vec4 rotate(int i, float theta);
     glm::vec4 scale(float sx, float sy, float sz);
 

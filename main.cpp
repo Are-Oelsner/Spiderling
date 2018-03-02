@@ -197,7 +197,7 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   switch(_key) {
     // Arrow keys
     case GLUT_KEY_LEFT:
-      cam.eye(0, -0.1);
+      cam.translate(-.1, 0., 0.);
       cam.at(0, -0.1);
       break;
     case GLUT_KEY_RIGHT:
@@ -408,7 +408,8 @@ main(int _argc, char** _argv) {
 
   for(int i = 0; i < objs.size(); i++) {
     objs[i].setPosition(glm::vec4(i*2, i*2, i*2, 1.));
-    objs[i].setColor((double)(rand()/(RAND_MAX)), (double)rand()/(RAND_MAX), (double)rand()/(RAND_MAX));
+    objs[i].setColor(0.3, i, 0.);
+    printf("%u\n\nsize: %lu\n", i, objs.size());
   }
 
   //////////////////////////////////////////////////////////////////////////////

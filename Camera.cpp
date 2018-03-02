@@ -16,14 +16,18 @@ Camera() {
   m_up[2] = 0;
 }
 
-//void
-//Camera::
-//mTransform() {
-//  //glm::vec4 c = glm::vec4(m_at, 1.0);
-//  glm::mat4 Model = glm::mat4(1.0);
-//  Model[4] = glm::vec4(1.0, 1.0, 0.0, 1.0);
-//  glm::vec4 m_at = mat * m_at;// Model Transform?
-//}
+glm::vec4
+Camera::
+translate(float tx, float ty, float tz) {
+  float tdata[16] = {
+    1., 0., 0., tx,
+    0., 1., 0., ty,
+    0., 0., 1., tz,
+    0., 0., 0., 1.};
+  m_translation = glm::make_mat4(tdata);
+  return m_eye = m_translation * m_eye;
+}
+
 
 void
 Camera::

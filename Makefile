@@ -71,11 +71,18 @@ pdf:
 r:
 	./spiderling objs.dat 0
 
-r1:
+rd:
 	./spiderling objs.dat 1
+
+r1:
+	./spiderling obj2.dat 0
+
 
 s:
 	./spiderling obj1.dat 0
+
+s1:
+	./spiderling obj1.dat 1
 
 gdb:
 	gdb spiderling

@@ -224,7 +224,7 @@ initTransforms() {
 
 glm::vec4
 Obj::
-transform(float tx, float ty, float tz) {
+translate(float tx, float ty, float tz) {
   float tdata[16] = {
     1., 0., 0., tx,
     0., 1., 0., ty,

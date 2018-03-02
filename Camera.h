@@ -17,6 +17,7 @@ class Camera {
 
     // Specifies position of eye point
     glm::vec4 m_eye;
+    glm::mat4 m_translation;
 
     // Specifies poition of the reference point
     glm::vec4 m_at;
@@ -34,7 +35,8 @@ class Camera {
     ///Functions
     void reset();
 
-    void mTransform();
+    glm::vec4 translate(float tx, float ty, float tz);
+
     //Setters
     void theta(float theta);
 
