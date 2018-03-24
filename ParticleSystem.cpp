@@ -1,7 +1,21 @@
 #include "ParticleSystem.h"
 
 ParticleSystem::
+ParticleSystem() {
+}
+
+ParticleSystem::
 ParticleSystem(int numParticles, int _lifetime, int _gravity) {
+  lifetime = _lifetime;
+  gravity = _gravity;
+  for(int i = 0; i < numParticles; i++) {
+    data.emplace_back(genParticle());
+  }
+}
+
+void
+ParticleSystem::
+init(int numParticles, int _lifetime, int _gravity) {
   lifetime = _lifetime;
   gravity = _gravity;
   for(int i = 0; i < numParticles; i++) {

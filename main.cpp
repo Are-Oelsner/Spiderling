@@ -62,6 +62,8 @@ Camera cam;
 // Object from .obj file specified by argv[1] in main
 vector<unique_ptr<Obj>> objs;
 
+ParticleSystem particles;
+
 
 // Frame rate
 const unsigned int FPS = 60;

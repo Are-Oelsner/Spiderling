@@ -103,3 +103,5 @@ with data struct for position, velocity
 draw as points
 after each draw loop
 update based on force model - gravity
+
+textbook pg. 726 actual or 719 tb

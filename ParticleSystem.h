@@ -30,13 +30,14 @@ class ParticleSystem {
 
   public:
     ///Constructors
-    ParticleSystem() {}
+    ParticleSystem();
     ParticleSystem(int numParticles, int _lifetime, int _gravity);
 
     ~ParticleSystem();
 
 
     ///Functions
+    void init(int numParticles, int _lifetime, int _gravity);
     Particle genParticle();
     glm::vec3 genPosition();
     glm::vec3 genVelocity();
