@@ -45,6 +45,7 @@
 #include "Obj.h"
 #include "WindowClass.h"
 #include "Camera.h"
+#include "ParticleSystem.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Spiderling Objects
@@ -62,7 +63,7 @@ Camera cam;
 // Object from .obj file specified by argv[1] in main
 vector<unique_ptr<Obj>> objs;
 
-ParticleSystem particles;
+vector<unique_ptr<ParticleSystem>> ps;
 
 
 // Frame rate
@@ -167,7 +168,7 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       cam.at(1, -0.5);
       break;
     case 97:        // a    look left
-        cam.at(0, -0.5);
+      cam.at(0, -0.5);
       break;
     case 100:       // d    look right
       cam.at(0, 0.5);
@@ -206,12 +207,12 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   switch(_key) {
     // Arrow keys
     case GLUT_KEY_LEFT:
-    //cam.translate(-.1, 0, 0);
+      //cam.translate(-.1, 0, 0);
       cam.eye(0, -.1);
       cam.at(0, -0.1);
       break;
     case GLUT_KEY_RIGHT:
-    //cam.translate(.1, 0, 0);
+      //cam.translate(.1, 0, 0);
       cam.eye(0, 0.1);
       cam.at(0, 0.1);
       break;
@@ -239,7 +240,7 @@ constructBuffers() {
     /// Element Buffer Object
     ////////////////////////////////////////////////////////////////////////////
     GLuint ebo;
-  glGenBuffers(1, &ebo);
+    glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i]->getIndices().size(), objs[i]->getIndices().data(), GL_STATIC_DRAW);
     ebos.emplace_back(ebo);
@@ -256,7 +257,7 @@ constructBuffers() {
     /// Vertex Buffer Object
     ////////////////////////////////////////////////////////////////////////////
     GLuint vbo;
-  glGenBuffers(1, &vbo);
+    glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*objs[i]->getData().size(), objs[i]->getData().data(), GL_STATIC_DRAW);
     vbos.emplace_back(vbo);
@@ -358,22 +359,20 @@ void parse(const char* file, const char* debug) {
   ifstream objFile;
   objFile.open(file);
   string filename;
-  //char* x, y, z;
+  string obj = ".obj";
+  size_t found;
   while(getline(objFile, filename)) {
-    printf("filename string: %s\n", filename);
-    objs.emplace_back(new Obj(filename));
-    printf("Object: %s\n", filename.c_str());
-    objs.back()->print(atoi(debug));
-  //objFile >> x >> y >> z;
-  //objs.back()->setPosition(strtof(x, NULL), strtof(y, NULL), strtof(z, NULL));
+    if(found != string::npos) {
+      objs.emplace_back(new Obj(filename));
+      printf("Object: %s\n", filename.c_str());
+      objs.back()->print(atoi(debug));
+    }
+    else  {
+      ps.emplace_back(new ParticleSystem(filename));
+      printf("Particle System: %s\n", filename.c_str());
+    }
   }
   objFile.close();
-
-  for(int i = 0; i < objs.size(); i++) {
-    objs[i]->setPosition(glm::vec4(i*2, i*2, i*2, 1.));
-    objs[i]->setColor(0.3, i, 0.);
-    printf("%u\n\nsize: %lu\n", i, objs.size());
-  }
 }
 
 
@@ -399,7 +398,7 @@ main(int _argc, char** _argv) {
 
   // Input Error
   if(_argc != 3) { 
-    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <0/1 debug>" << std::endl; 
+    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <filename.dat> <0/1 debug>" << std::endl; 
   }
 
   // GL
@@ -420,7 +419,8 @@ main(int _argc, char** _argv) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Construct Buffer Objects 
-  constructBuffers();
+  if(objs.size() > 0)
+    constructBuffers();
 
   //////////////////////////////////////////////////////////////////////////////
   // Start application

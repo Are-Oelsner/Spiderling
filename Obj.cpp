@@ -167,6 +167,7 @@ loadOBJ(const char *filename) {
     unsigned int normalIndex = normalIndexList[i];
     normalIndices.push_back(normalIndex-1); 
   }
+  fclose(file);
 }
 
 char*
