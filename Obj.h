@@ -8,6 +8,7 @@
 #include <string.h>
 #include <map>
 #include <stdexcept>
+#include <string>
 
 #include "Vec.h"
 
@@ -35,6 +36,8 @@ class Obj {
 
     // Transformations
     glm::vec4 position;
+    glm::vec4 orientation;
+    glm::vec4 size;
 
     glm::mat4 m_translation;
     glm::mat4 m_rotation;
@@ -55,17 +58,10 @@ class Obj {
     vector<unsigned int> uvIndices;
     vector<unsigned int> normalIndices;
 
-    // Stats
-    unsigned int numVertexIndices = 0;
-    unsigned int numVertices = 0;
-    unsigned int numUVs = 0;
-    unsigned int numNormals = 0;
-    unsigned int numFaces = 0;
-
   public:
     ///Constructors
     Obj() {}
-    Obj(const char *filename);
+    Obj(string filename);
 
     ~Obj();
 
@@ -80,6 +76,8 @@ class Obj {
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
     bool loadOBJ(const char *filename);
 
+    char* parseInput(char* input);
+
     void constructData();
 
     void initTransforms();
@@ -89,17 +87,27 @@ class Obj {
     void print(bool debug);
 
     //Getters
-    vector<VEC6>* getData();
-    vector<unsigned int>* getIndices();
+    const vector<VEC6>& getData();
+    const vector<unsigned int>& getIndices();
 
     glm::vec4* getPosition() {return &position;}
     float getPosition(int i) {return position[i];}
     void setPosition(glm::vec4 vec) {position = vec;}
     void setPosition(float x, float y, float z) {position = glm::vec4(x, y, z, 1);}
 
-    glm::mat4* getTranslation() {return &m_translation;}
-    glm::mat4* getRotation() {return &m_rotation;}
-    glm::mat4* getScale() {return &m_scale;}
+    glm::vec4* getRotation() {return &orientation;}
+    float getRotation(int i) {return orientation[i];}
+    void setRotation(glm::vec4 vec) {orientation = vec;}
+    void setRotation(float x, float y, float z) {orientation = glm::vec4(x, y, z, 1);}
+
+    glm::vec4* getScale() {return &size;}
+    float getScale(int i) {return size[i];}
+    void setScale(glm::vec4 vec) {size = vec;}
+    void setScale(float x, float y, float z) {size = glm::vec4(x, y, z, 1);}
+
+    glm::mat4* getTranslationM() {return &m_translation;}
+    glm::mat4* getRotationM() {return &m_rotation;}
+    glm::mat4* getScaleM() {return &m_scale;}
 
     glm::vec3* getTran() {return &m_tran;}
 
@@ -118,18 +126,12 @@ class Obj {
   protected:
     ////////////////////////////////////////////////////////////////////////////////
     /// Helper Functions
-    vector<glm::vec3>* getVertices();
-    vector<unsigned int>* getVertexIndices();
-    vector<glm::vec2>* getUvs();
-    vector<unsigned int>* getUvIndices();
-    vector<glm::vec3>* getNormals();
-    vector<unsigned int>* getNormalIndices();
-
-    unsigned int getNumVertices() {return numVertices;}
-    unsigned int getNumUVs() {return numUVs;}
-    unsigned int getNumNormals() {return numNormals;}
-    unsigned int getNumFaces() {return numFaces;}
-    unsigned int getNumVertexIndices() {return numVertexIndices;}
+    const vector<glm::vec3>& getVertices();
+    const vector<unsigned int>& getVertexIndices();
+    const vector<glm::vec2>& getUvs();
+    const vector<unsigned int>& getUvIndices();
+    const vector<glm::vec3>& getNormals();
+    const vector<unsigned int>& getNormalIndices();
 };
 
 #endif

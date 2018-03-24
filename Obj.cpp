@@ -5,7 +5,9 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 ///Constructors 
 Obj::
-Obj(const char *filename) {
+Obj(string input) {
+  char* tmp = (char*)input.c_str();
+  char* filename = parseInput(tmp);
   loadOBJ(filename);
   constructData();
   initTransforms();
@@ -20,44 +22,44 @@ Obj::
 
 ////////////////////////////////////////////////////////////////////////////////
 ///Functions
-vector<VEC6>*
+const vector<VEC6>&
 Obj::getData() {
-  return &data;
+  return data;
 }
 
-vector<unsigned int>*
+const vector<unsigned int>&
 Obj::getIndices() {
-  return &indices;
+  return indices;
 }
 
-vector<glm::vec3>*
+const vector<glm::vec3>&
 Obj::getVertices() {
-  return &vertices;
+  return vertices;
 }
 
-vector<unsigned int>*
+const vector<unsigned int>&
 Obj::getVertexIndices() {
-  return &vertexIndices;
+  return vertexIndices;
 }
 
-vector<glm::vec2>*
+const vector<glm::vec2>&
 Obj::getUvs() {
-  return &uvs;
+  return uvs;
 }
 
-vector<unsigned int>*
+const vector<unsigned int>&
 Obj::getUvIndices() {
-  return &uvIndices;
+  return uvIndices;
 }
 
-vector<glm::vec3>*
+const vector<glm::vec3>&
 Obj::getNormals() {
-  return &normals;
+  return normals;
 }
 
-vector<unsigned int>*
+const vector<unsigned int>&
 Obj::getNormalIndices() {
-  return &normalIndices;
+  return normalIndices;
 }
 
 void
@@ -96,25 +98,21 @@ loadOBJ(const char *filename) {
       glm::vec3 vertex;
       int tmp = fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
       vertices.push_back(vertex);
-      numVertices++;
     }
     // Vertex Textures -- Don't need for now TODO
     else if(strcmp(lineHeader, "vt") == 0) {
       glm::vec2 uv;
       int tmp = fscanf(file, "%f %f\n", &uv.x, &uv.y);
       uvs.push_back(uv);
-      numUVs++;
     }
     // Vertex Normals
     else if(strcmp(lineHeader, "vn") == 0) {
       glm::vec3 normal;
       int tmp = fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
       normals.push_back(normal);
-      numNormals++;
     }
     // Faces
     else if(strcmp(lineHeader, "f") == 0) {
-      std::string vertex1, vertex2, vertex3; //TODO what is this for?
       unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
       int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2], &vertexIndex[3], &uvIndex[3], &normalIndex[3]);
       if((matches % 3) !=  0) {
@@ -132,8 +130,6 @@ loadOBJ(const char *filename) {
         normalIndexList.push_back(normalIndex[0]);
         normalIndexList.push_back(normalIndex[1]);
         normalIndexList.push_back(normalIndex[2]);
-        numFaces++;
-        numVertexIndices += 3;
         setMode(3);
       }
       else if(matches == 12) {
@@ -149,8 +145,6 @@ loadOBJ(const char *filename) {
         normalIndexList.push_back(normalIndex[1]);
         normalIndexList.push_back(normalIndex[2]);
         normalIndexList.push_back(normalIndex[3]);
-        numFaces++;
-        numVertexIndices += 4;
         setMode(4);
       }
 
@@ -161,7 +155,7 @@ loadOBJ(const char *filename) {
   // Vertex Indexing
   for(unsigned int i = 0; i < vertexIndexList.size(); i++) {
     unsigned int vertexIndex = vertexIndexList[i];
-    vertexIndices.push_back(vertexIndex-1); //TODO vertexIndex-1?
+    vertexIndices.push_back(vertexIndex-1); 
   }
   // UV indexing
   for(unsigned int i = 0; i < uvIndexList.size(); i++) {
@@ -171,14 +165,33 @@ loadOBJ(const char *filename) {
   // Normal indexing
   for(unsigned int i = 0; i < normalIndexList.size(); i++) {
     unsigned int normalIndex = normalIndexList[i];
-    normalIndices.push_back(normalIndex-1); //TODO normalIndex-1?
+    normalIndices.push_back(normalIndex-1); 
   }
+}
+
+char*
+Obj::
+parseInput(char* input) {
+  char* filename = strtok(input, " ");
+  float x = atof(strtok(NULL, " "));
+  float y = atof(strtok(NULL, " "));
+  float z = atof(strtok(NULL, " "));
+  setPosition(x, y, z);
+  x = atof(strtok(NULL, " "));
+  y = atof(strtok(NULL, " "));
+  z = atof(strtok(NULL, " "));
+  setRotation(x, y, z);
+  x = atof(strtok(NULL, " "));
+  y = atof(strtok(NULL, " "));
+  z = atof(strtok(NULL, " "));
+  setScale(x, y, z);
+  return filename;
 }
 
 void
 Obj::
 print(bool debug) {
-  printf("mode: %u\t#vertices: %u\t#uvs: %u\t#normals: %u\n#faces: %u\t#vertIndices: %u\ndata: %lu\tindices:%lu\n\n", mode, numVertices, numUVs, numNormals, numFaces, numVertexIndices, data.size(), indices.size());
+  printf("mode: %u\t#vertices: %lu\t#uvs: %lu\t#normals: %lu\n#faces: %lu\t#vertIndices: %lu\ndata: %lu\tindices:%lu\n\n", mode, vertices.size(), uvs.size(), normals.size(), vertices.size()/mode, vertexIndices.size(), data.size(), indices.size());
   if(debug) {
     for(int i = 0; i < indices.size(); i++) {
       printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);

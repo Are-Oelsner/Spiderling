@@ -37,10 +37,15 @@ change from pointers to const reference
 
 
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+Project 1 Revisions
+#TODO
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 Project 2 Revisions
 
-Use library for PI.
+#Use library for PI.
 
 have const correctness on functions + params
 
@@ -56,4 +61,45 @@ Reduce construction/copying cost of methods/code
 
 Arrays in methods make static to reduce memory/initialization cost
 
-Have parse method for file, and not just part of main
+#Have parse method for file, and not just part of main
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+Project 3 Details
+In this assignment, you will create some sort of animation. You can either
+design a key-frame system for a hierarchical model or create a particle system.
+The hierarchical model should be non-trivial, i.e., a tree hierarchy with at
+least five components in 3D. The particle system should contain a generator an
+attractor and at least three other forces. Add the specification of the
+animation to your working scene specification (your file format from assignment
+2).
+
+Extras
+Improve the efficiency of your rendering.
+
+Allow user input to influence your animation.
+
+Support both hierarchical models and particle systems.
+
+For a hierarchical model, support interpolation with splines in addition to
+linear interpolation.
+
+For the particle system, allow changes in state other than position and velocity.
+
+For the particle system, support a large variety of generators, attractors,
+repulsors, etc. in your file format.
+
+For the particle system, support collision with objects.
+
+Provide the ability to script the motion of the camera.
+
+Etc
+
+
+Particle System:
+immediate mode for particles
+ParticleSystem Object
+with data struct for position, velocity
+draw as points
+after each draw loop
+update based on force model - gravity

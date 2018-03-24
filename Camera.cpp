@@ -62,7 +62,7 @@ Camera::
 hLook(float angle) {
   glm::vec4 diff = m_at - m_eye;
   c_theta[0] += angle;
-  m_at[0] = abs(glm::distance(m_eye, m_at)) *std::cos((PI/2)+c_theta[0]) + m_eye[0];
+  m_at[0] = abs(glm::distance(m_eye, m_at)) *std::cos((M_PI/2)+c_theta[0]) + m_eye[0];
   c_theta[1] += angle;
   m_at[1] = abs(glm::distance(m_eye, m_at)) * std::sin(c_theta[1]) + m_eye[1];
 }
@@ -70,25 +70,5 @@ void
 Camera::
 vLook(float angle) {
 }
-
-
-
-//void 
-//Camera::
-//eye(int i, double c) {
-//  if(i == 0) {
-//    glm::vec4 c = Vec::cross(m_eye-m_at, m_up);
-//
-//    glm::mat4 mat = Vec::constructIdentityMatrix();
-//    mat *= glm::normalize(c);
-//    mat += eye;
-//    eye = Vec::mToVec4(mat);
-//
-//    // eye += glm::normalize(c);
-//  }
-//}
-
-
-
 
 

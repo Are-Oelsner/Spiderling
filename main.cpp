@@ -16,7 +16,7 @@
 // STL
 #include <cmath>
 #include <chrono>
-#include <iostream>
+//#include <iostream>
 #include <fstream>
 
 #include <string>
@@ -239,7 +239,7 @@ constructBuffers() {
     GLuint ebo;
   glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i]->getIndices()->size(), objs[i]->getIndices()->data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i]->getIndices().size(), objs[i]->getIndices().data(), GL_STATIC_DRAW);
     ebos.emplace_back(ebo);
 
 
@@ -256,7 +256,7 @@ constructBuffers() {
     GLuint vbo;
   glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*objs[i]->getData()->size(), objs[i]->getData()->data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*objs[i]->getData().size(), objs[i]->getData().data(), GL_STATIC_DRAW);
     vbos.emplace_back(vbo);
 
 
@@ -310,14 +310,13 @@ draw() {
   glPointSize(10);
 
 
-  vector<vector<float>> tran = {{5, 1, 0}, {0, 0, 0}, {-5, -1, 0}, {20, 0, -20}};
 
   for(int i = 0; i < objs.size(); i++) {
     glMatrixMode(GL_MODELVIEW);
     //glLoadIdentity();
     glPushMatrix();
-    objs[i]->translate(tran[i][0], tran[i][1], tran[i][2]);
     glTranslatef((GLfloat) objs[i]->getPosition(0), (GLfloat) objs[i]->getPosition(1), (GLfloat) objs[i]->getPosition(2));
+    glRotatef((GLfloat) objs[i]->getRotation(0), (GLfloat) objs[i]->getRotation(1), (GLfloat) objs[i]->getRotation(2), (GLfloat) objs[i]->getRotation(3));
 
     glColor3f(objs[i]->getColor(0), objs[i]->getColor(1), objs[i]->getColor(2));
 
@@ -332,9 +331,9 @@ draw() {
     glNormalPointer(GL_FLOAT, sizeof(VEC6), (GLvoid*)(sizeof(glm::vec3)));
 
     if(objs[i]->getMode() == 4) 
-      glDrawElements(GL_QUADS, objs[i]->getIndices()->size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_QUADS, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
     else 
-      glDrawElements(GL_TRIANGLES, objs[i]->getIndices()->size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
     glPopMatrix();
   }
 
@@ -353,6 +352,27 @@ draw() {
   //printf("FPS: %6.2f\n", g_framesPerSecond);
 }
 
+void parse(const char* file, const char* debug) {
+  ifstream objFile;
+  objFile.open(file);
+  string filename;
+  //char* x, y, z;
+  while(getline(objFile, filename)) {
+    printf("filename string: %s\n", filename);
+    objs.emplace_back(new Obj(filename));
+    printf("Object: %s\n", filename.c_str());
+    objs.back()->print(atoi(debug));
+  //objFile >> x >> y >> z;
+  //objs.back()->setPosition(strtof(x, NULL), strtof(y, NULL), strtof(z, NULL));
+  }
+  objFile.close();
+
+  for(int i = 0; i < objs.size(); i++) {
+    objs[i]->setPosition(glm::vec4(i*2, i*2, i*2, 1.));
+    objs[i]->setColor(0.3, i, 0.);
+    printf("%u\n\nsize: %lu\n", i, objs.size());
+  }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,29 +412,15 @@ main(int _argc, char** _argv) {
   glutSpecialFunc(specialKeyPressed);
   glutTimerFunc(1000/FPS, timer, 0);
 
-  ifstream objFile;
-  objFile.open(_argv[1]);
-  string filename;
-  //char* x, y, z;
-  while(getline(objFile, filename)) {
-    objs.emplace_back(new Obj(filename.c_str()));
-    printf("Object: %s\n", filename.c_str());
-    objs.back()->print(atoi(_argv[2]));
-  //objFile >> x >> y >> z;
-  //objs.back()->setPosition(strtof(x, NULL), strtof(y, NULL), strtof(z, NULL));
-  }
-  objFile.close();
-
-  for(int i = 0; i < objs.size(); i++) {
-    objs[i]->setPosition(glm::vec4(i*2, i*2, i*2, 1.));
-    objs[i]->setColor(0.3, i, 0.);
-    printf("%u\n\nsize: %lu\n", i, objs.size());
-  }
+  //////////////////////////////////////////////////////////////////////////////
+  // Parses File and Constructs Objs
+  parse(_argv[1], _argv[2]);
 
   //////////////////////////////////////////////////////////////////////////////
-  // Construct Buffers
+  // Construct Buffer Objects 
   constructBuffers();
 
+  //////////////////////////////////////////////////////////////////////////////
   // Start application
   std::cout << "Starting Application" << std::endl;
   glutMainLoop();

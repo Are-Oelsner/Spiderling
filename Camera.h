@@ -1,6 +1,9 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
+#define _USE_MATH_DEFINES
+
+#include <math.h>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/glm.hpp>
@@ -8,7 +11,7 @@
 #include <iostream>
 #include <cmath>
 
-#include "Vec.h"
+//#include "Vec.h"
 
 
 class Camera {
@@ -28,7 +31,6 @@ class Camera {
     
     // Specifies the direction of the up vector
     glm::vec4 m_up;
-    double PI = 3.1415926535897;
 
   public:
     ///Constructors
@@ -50,10 +52,10 @@ class Camera {
     float getUp(int i) {if(i >= 0 && i <= 2) return m_up[i];}
 
     // Incrementers
-    void incTheta(float inc) {g_theta += inc;}
-    void eye(int i, double c) {m_eye[i] += c;}
-    void at( int i, double c) {m_at[i] += c;}
-    void upI(int i, double c) {m_up[i] += c;}
+    void incTheta(const float inc) {g_theta += inc;}
+    void eye(const int i, const double c) {m_eye[i] += c;}
+    void at(const int i, const double c) {m_at[i] += c;}
+    void upI(const int i, const double c) {m_up[i] += c;}
 
     // Look around functions
     void hLook(float angle);
