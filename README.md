@@ -105,3 +105,8 @@ after each draw loop
 update based on force model - gravity
 
 textbook pg. 726 actual or 719 tb
+
+
+TODO Fix bug, check 'in loop, in loop 3' error
+
+TODO get cone initial velocity generation working, find out why gravity goes to the leftish

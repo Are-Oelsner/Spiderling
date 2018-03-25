@@ -13,7 +13,6 @@ Obj(string input) {
   initTransforms();
   position = glm::vec4(0., 0., 0., 1.);
   m_tran = glm::vec3(0., 0., 0.);
-  setColor(.4, rand(), 0);
 }
 
 Obj::
@@ -174,18 +173,36 @@ char*
 Obj::
 parseInput(char* input) {
   char* filename = strtok(input, " ");
-  float x = atof(strtok(NULL, " "));
-  float y = atof(strtok(NULL, " "));
-  float z = atof(strtok(NULL, " "));
-  setPosition(x, y, z);
-  x = atof(strtok(NULL, " "));
-  y = atof(strtok(NULL, " "));
-  z = atof(strtok(NULL, " "));
-  setRotation(x, y, z);
-  x = atof(strtok(NULL, " "));
-  y = atof(strtok(NULL, " "));
-  z = atof(strtok(NULL, " "));
-  setScale(x, y, z);
+  char* tmp;
+  float x, y, z;
+  if((tmp = strtok(NULL, " ")) != NULL)
+    x = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    y = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    z = atof(tmp);
+  setPosition(x, y, z); // Sets position transform
+  if((tmp = strtok(NULL, " ")) != NULL)
+    x = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    y = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    z = atof(tmp);
+  setRotation(x, y, z); // Sets rotation transform
+  if((tmp = strtok(NULL, " ")) != NULL)
+    x = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    y = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    z = atof(tmp);
+  setScale(x, y, z); // Sets scale transform
+  if((tmp = strtok(NULL, " ")) != NULL)
+    x = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    y = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    z = atof(tmp);
+  setColor(x, y, z); // Sets object color
   return filename;
 }
 

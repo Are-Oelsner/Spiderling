@@ -340,6 +340,34 @@ draw() {
     glPopMatrix();
   }
 
+  for(int i = 0; i < ps.size(); i++) {
+    glMatrixMode(GL_MODELVIEW);
+    //glLoadIdentity();
+    glPushMatrix();
+    //glTranslatef((GLfloat) objs[i]->getPosition(0), (GLfloat) objs[i]->getPosition(1), (GLfloat) objs[i]->getPosition(2));
+    //glRotatef((GLfloat) objs[i]->getRotation(0), (GLfloat) objs[i]->getRotation(1), (GLfloat) objs[i]->getRotation(2), (GLfloat) objs[i]->getRotation(3));
+    
+    //ps[i]->printData();
+
+    // draw here
+    //const vector<Particle>* p = ps[i]->getData();
+    ps.at(i)->draw();
+    ps.at(i)->update();
+  //glBegin(GL_POINTS);
+  //for(int j = 0; j < ps.at(i)->getNumParticles(); i++) {
+  //  printf("in loop\n");
+
+  //  //printf("%f\t%f\t%f\n", (GLfloat)ps.at(i)->getParticle(j).color[0], (GLfloat)ps.at(i)->getParticle(j).color[1], (GLfloat)ps.at(i)->getParticle(j).color[2]); 
+  //  //glColor3f((GLfloat)ps.at(i)->getParticle(j).color[0], (GLfloat)ps.at(i)->getParticle(j).color[1], (GLfloat)ps.at(i)->getParticle(j).color[2]); 
+  //  printf("%f\n", (GLfloat) ps.at(i)->pos(j,0)); //(GLfloat)ps.at(i)->getParticle(j)->position[1], (GLfloat)ps.at(i)->getParticle(j)->position[2]); 
+  //  printf("%f\t%f\t%f\n", (GLfloat) ps.at(i)->getParticle(j)->position[0], (GLfloat)ps.at(i)->getParticle(j)->position[1], (GLfloat)ps.at(i)->getParticle(j)->position[2]); 
+  //  glVertex3f((GLfloat)ps.at(i)->getParticle(j)->position[0], (GLfloat)ps.at(i)->getParticle(j)->position[1], (GLfloat)ps.at(i)->getParticle(j)->position[2]);
+  //  printf("in loop3\n");
+  //}
+  //glEnd();
+    glPopMatrix();
+  }
+
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -360,16 +388,20 @@ void parse(const char* file, const char* debug) {
   objFile.open(file);
   string filename;
   string obj = ".obj";
-  size_t found;
+  size_t foundobj;
+  size_t foundpar;
   while(getline(objFile, filename)) {
-    if(found != string::npos) {
+    foundobj = filename.find(".obj");
+    foundpar = filename.find(".par");
+    if(foundobj == string::npos && foundpar != string::npos) {
+      ps.emplace_back(new ParticleSystem(filename));
+      printf("Particle System: %s\n", filename.c_str());
+      ps.back()->print();
+    }
+    else if(foundobj != string::npos && foundpar == string::npos)  {
       objs.emplace_back(new Obj(filename));
       printf("Object: %s\n", filename.c_str());
       objs.back()->print(atoi(debug));
-    }
-    else  {
-      ps.emplace_back(new ParticleSystem(filename));
-      printf("Particle System: %s\n", filename.c_str());
     }
   }
   objFile.close();
