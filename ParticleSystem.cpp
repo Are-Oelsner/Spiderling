@@ -26,25 +26,25 @@ ParticleSystem(string filename) {
     if(strcmp(lineHeader, "l") == 0)
       int tmp = fscanf(file, "%u %u\n", &tmin, &tmax); // reads in lifetime  
     else if(strcmp(lineHeader, "g") == 0)
-      int tmp = fscanf(file, "%f\n", &gravity); // reads in lifetime  
+      int tmp = fscanf(file, "%f\n", &gravity); // reads in gravity  
     else if(strcmp(lineHeader, "i") == 0)
       int tmp = fscanf(file, "%f\n", &airResistance); // reads in air resistance 
     else if(strcmp(lineHeader, "w") == 0)
       int tmp = fscanf(file, "%f %f %f\n", &wind[0], &wind[1], &wind[2]); // reads in wind vector  
     else if(strcmp(lineHeader, "n") == 0)
-      int tmp = fscanf(file, "%u\n", &numParticles); // reads in lifetime  
+      int tmp = fscanf(file, "%u\n", &numParticles); // reads in number of particles  
     else if(strcmp(lineHeader, "a") == 0)
-      int tmp = fscanf(file, "%f\n", &angle); // reads in lifetime  
+      int tmp = fscanf(file, "%f\n", &angle); // reads in angle for generation  
     else if(strcmp(lineHeader, "p") == 0)
       int tmp = fscanf(file, "%f %f %f %f %f %f\n", &xmin, &xmax, &ymin, &ymax, &zmin, &zmax); // gen cube
     else if(strcmp(lineHeader, "v") == 0)
-      int tmp = fscanf(file, "%f %f\n", &vmin, &vmax); // gen cube
+      int tmp = fscanf(file, "%f %f\n", &vmin, &vmax); // generates initial velocity magnitude
     else if(strcmp(lineHeader, "t") == 0)
       int tmp = fscanf(file, "%f %f %f\n", &position.x, &position.y, &position.z); // translation
     else if(strcmp(lineHeader, "r") == 0)
-      int tmp = fscanf(file, "%f %f %f\n", &direction.x, &direction.y, &direction.z); // translation
+      int tmp = fscanf(file, "%f %f %f\n", &direction.x, &direction.y, &direction.z); // rotation
     else if(strcmp(lineHeader, "s") == 0)
-      int tmp = fscanf(file, "%f %f %f\n", &size.x, &size.y, &size.z); // translation
+      int tmp = fscanf(file, "%f %f %f\n", &size.x, &size.y, &size.z); // scale
   }
   fclose(file);
 
@@ -122,9 +122,12 @@ update(const vector<Repulsor> repulsors) {
     else {
       for(int j = 0; j < repulsors.size(); j++) {// Get sum repulsor forces 
         // TODO add attractor if statement
-        dir = data[i].position - repulsors[j].position;// TODO switch order?
+        if(repulsors[j].state == 1)
+          dir = data[i].position - repulsors[j].position;// TODO switch order?
+        else if(repulsors[j].state == 0)
+          dir = repulsors[j].position - data[i].position;// TODO switch order?
         r = length(dir);
-        F = (G * repulsors[j].mass)/(r*r);
+        F = (.5 * repulsors[j].mass)/(r*r);
         netRepulsorForces += (F * normalize(dir));// TODO normalize right function?
       }
       data[i].velocity += netRepulsorForces;
@@ -156,8 +159,8 @@ void
 ParticleSystem::
 print() {
   printf("#particles:\t%lu\tnumParticles:\t%u\tangle:\t%f\tgravity:\t%f\n", data.size(), numParticles, angle, gravity);
-  printf("tmin:\t%u\t\ttmax:%u\tvmin:\t%f\tvmax:\t%f\n", tmin, tmax, vmin, vmax);
-  printf("xmin:\t%f\txmax:%f\tymin:\t%f\tymax:\t%f\tzmin:\t%f\tzmax:\t%f\n\n", xmin, xmax, ymin, ymax, zmin, zmax);
+  printf("tmin:\t\t%u\ttmax:\t\t%u\tvmin:\t%f\tvmax:\t\t%f\n", tmin, tmax, vmin, vmax);
+  printf("xmin:\t\t%.2f\txmax:\t\t%.2f\tymin:\t%.2f\t\tymax:\t\t%.2f\tzmin:\t%.2f\tzmax:\t%.2f\n\n", xmin, xmax, ymin, ymax, zmin, zmax);
 }
 
 void

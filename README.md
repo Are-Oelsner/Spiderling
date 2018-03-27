@@ -15,6 +15,41 @@ r - reset camera
 i - look left beta
 o - look right beta
 
+<filename.obj> tx ty tz rx ry rz sx sy sz cr cg cb
+tx float x translation in scene
+ty float y translation in scene
+tz float z translation in scene
+rx float x rotation in scene
+ry float y rotation in scene
+rz float z rotation in scene
+sx float x scale in scene
+sy float y scale in scene
+sz float z scale in scene
+cr float red color of object
+cg float green color of object
+cb float blue color of object
+
+<filename.par>
+l intMin intMax                 # particle lifetime uniform generation range
+g -float                        # negative float representing gravity, applied to y axis
+i -float                        # negative float representing air resistance, applied to x, y, and z
+w floatx floaty floatz          # floats representing wind in x, y, and z
+n int                           # positive int number of particles
+a float                         # angle from verticle specifying cone of generation for initial velocities
+p xmin xmax ymin ymax zmin zmax # floats representing the bounding box for generating particle initial position
+v vmin vmax                     # floats representing range of magnitudes for initial velocities
+t xfloat yfloat zfloat          # floats representing translation of system within the scene. Default to 0 0 0
+r xfloat yfloat zfloat          # floats representing rotation of system within the scene. Default to 0 0 0
+s xfloat yfloat zfloat          # floats representing scale of system within the scene. Default to 1 1 1
+
+<filename.rep> xpos ypos zpos mass status
+xpos float representing x position of point attractor
+ypos float representing y position of point attractor
+zpos float representing z position of point attractor
+mass float representing mass of point attractor
+status int shows state of either repulsor when >0 or attractor when <= 0
+
+
 left - move left
 right - move right
 up - move camera up
