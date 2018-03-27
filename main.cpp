@@ -64,7 +64,7 @@ Camera cam;
 vector<unique_ptr<Obj>> objs;
 
 vector<unique_ptr<ParticleSystem>> ps;
-vector<unique_ptr<struct Repulsor>> repulsors;
+vector<struct Repulsor> repulsors;
 
 
 // Frame rate
@@ -232,20 +232,20 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   }
 }
 
-Repulsor* makeRepulsor(string filename) {
-  struct Repulsor* repulsor = new Repulsor;
+Repulsor makeRepulsor(string filename) {
+  struct Repulsor repulsor;
   char* input = (char*) filename.c_str();
   char* tmp = strtok(input, " ");
   if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor->position[0] = atof(tmp);
+    repulsor.position[0] = atof(tmp);
   if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor->position[1] = atof(tmp);
+    repulsor.position[1] = atof(tmp);
   if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor->position[2] = atof(tmp);
+    repulsor.position[2] = atof(tmp);
   if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor->mass = atof(tmp);
+    repulsor.mass = atof(tmp);
   if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor->state = atoi(tmp);
+    repulsor.state = atoi(tmp);
   return repulsor;
 }
 
@@ -380,7 +380,7 @@ draw() {
     // draw 
     ps.at(i)->draw();
     // update
-    ps.at(i)->update();
+    ps.at(i)->update(repulsors);
 
     glPopMatrix();
   }
@@ -390,7 +390,7 @@ draw() {
   glColor3f(.0f, .0f, .0f);
   glBegin(GL_POINTS);
   for(int i = 0; i < repulsors.size(); i++) {
-    glVertex3f((GLfloat) repulsors.at(i)->position[0], (GLfloat) repulsors.at(i)->position[1], (GLfloat) repulsors.at(i)->position[2]);
+    glVertex3f((GLfloat) repulsors.at(i).position[0], (GLfloat) repulsors.at(i).position[1], (GLfloat) repulsors.at(i).position[2]);
   }
   glEnd();
 

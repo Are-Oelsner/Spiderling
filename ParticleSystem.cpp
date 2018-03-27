@@ -104,13 +104,24 @@ genTime() {
 
 void 
 ParticleSystem::
-update() {
+update(const vector<Repulsor> repulsors) {
+  glm::vec3 netRepulsorForces(0.f, 0.f, 0.f);
+  glm::vec3 dir;
+  float r;
+  float F;
   for(int i = 0; i < data.size(); i++) {
     if(data[i].time >= data[i].maxTime)
       data[i] = genParticle();
     else {
+      for(int j = 0; j < repulsors.size(); j++) {
+        dir = data[i].position - repulsors[j].position;// TODO switch order?
+        r = length(dir);
+        F = (G * repulsors[j].mass)/(r*r);
+        netRepulsorForces += (F * normalize(dir));// TODO normalize right function?
+      }
       data[i].position = data[i].position + data[i].velocity; //TODO include timestep
-      data[i].velocity[1] += gravity;
+      data[i].velocity += netRepulsorForces;
+      data[i].velocity[1] += gravity ;
       data[i].color = genColor(data[i].time);
       data[i].time++;
     }

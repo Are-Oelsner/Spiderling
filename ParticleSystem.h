@@ -25,7 +25,7 @@
 #include <random>
 #include <math.h>
 
-#define G = 6.674e-11 // Defines gravitational constant
+#define G 6.674e-11 // Defines gravitational constant
 
 using namespace std;
 
@@ -85,7 +85,7 @@ class ParticleSystem {
     float getScale(int i) {return size[i];}
 
     int genTime();
-    void update();
+    void update(const vector<Repulsor> repulsors);
     void draw();
     void print();
     void printData();
