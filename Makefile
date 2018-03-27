@@ -64,7 +64,10 @@ clean:
 ## My Stuff
 ################################################################################
 o:
-	vim main.cpp +":tabf ParticleSystem.cpp" +":vsplit ParticleSystem.h" +":tabf Obj.cpp" +":vsplit Obj.h" +":tabf Camera.cpp" +":vsplit Camera.h" +":tabf Vec.cpp" +":vsplit Vec.h" +":tabf README.md" + gt
+	vim main.cpp +":tabf ParticleSystem.cpp" +":vsplit ParticleSystem.h" +":tabf Obj.cpp" +":vsplit Obj.h" +":tabf Camera.cpp" +":vsplit Camera.h" +":tabf Vec.cpp" +":vsplit Vec.h" +":tabf PS.dat" +":vsplit smoke.par" +":tabf README.md"
+
+os:
+	vim main.cpp +":tabf ParticleSystem.cpp" +":vsplit ParticleSystem.h" +":tabf Obj.cpp" +":vsplit Obj.h" +":tabf PS.dat" +":vsplit smoke.par" +":tabf README.md"
 
 pdf:
 	evince Project1.pdf

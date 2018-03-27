@@ -27,6 +27,10 @@ ParticleSystem(string filename) {
       int tmp = fscanf(file, "%u %u\n", &tmin, &tmax); // reads in lifetime  
     else if(strcmp(lineHeader, "g") == 0)
       int tmp = fscanf(file, "%f\n", &gravity); // reads in lifetime  
+    else if(strcmp(lineHeader, "i") == 0)
+      int tmp = fscanf(file, "%f\n", &airResistance); // reads in air resistance 
+    else if(strcmp(lineHeader, "w") == 0)
+      int tmp = fscanf(file, "%f %f %f\n", &wind[0], &wind[1], &wind[2]); // reads in wind vector  
     else if(strcmp(lineHeader, "n") == 0)
       int tmp = fscanf(file, "%u\n", &numParticles); // reads in lifetime  
     else if(strcmp(lineHeader, "a") == 0)
@@ -89,6 +93,9 @@ genColor(int time) {
   float r = .89;
   float g = .35;
   float b = .13;
+  if(time == 0)
+    time = 1;
+  time /= 2.0;
   r *= (1/(float)time);
   g *= (1/(float)time);
   b *= (1/(float)time);
@@ -113,15 +120,21 @@ update(const vector<Repulsor> repulsors) {
     if(data[i].time >= data[i].maxTime)
       data[i] = genParticle();
     else {
-      for(int j = 0; j < repulsors.size(); j++) {
+      for(int j = 0; j < repulsors.size(); j++) {// Get sum repulsor forces 
+        // TODO add attractor if statement
         dir = data[i].position - repulsors[j].position;// TODO switch order?
         r = length(dir);
         F = (G * repulsors[j].mass)/(r*r);
         netRepulsorForces += (F * normalize(dir));// TODO normalize right function?
       }
-      data[i].position = data[i].position + data[i].velocity; //TODO include timestep
       data[i].velocity += netRepulsorForces;
-      data[i].velocity[1] += gravity ;
+      data[i].velocity[1] += gravity;
+      data[i].velocity += wind;
+      glm::vec3 airRes = normalize(data[i].velocity)*airResistance;
+      data[i].velocity += airRes;
+
+      data[i].position = data[i].position + data[i].velocity; //TODO include timestep TODO move to bottom?
+      // TODO add if statement for exceeding a max velocity
       data[i].color = genColor(data[i].time);
       data[i].time++;
     }
