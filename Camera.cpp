@@ -5,7 +5,7 @@ Camera() {
   g_theta = 0.f;
   m_eye[0] = 0;
   m_eye[1] = 20;
-  m_eye[2] = 20;
+  m_eye[2] = 40;
 
   c_theta[0] = 0;
   c_theta[1] = 0;

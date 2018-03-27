@@ -25,6 +25,8 @@
 #include <random>
 #include <math.h>
 
+#define G = 6.674e-11 // Defines gravitational constant
+
 using namespace std;
 
 struct Particle { // Particle struct type made up of two glm::vec3s to store position + velocity info
@@ -35,12 +37,14 @@ struct Particle { // Particle struct type made up of two glm::vec3s to store pos
   int maxTime;
 };
 
-  static default_random_engine generator;
-//uniform_real_distribution<float>* xdistribution;
-//uniform_real_distribution<float>* ydistribution;
-//uniform_real_distribution<float>* zdistribution;
+struct Repulsor { // Repulsor/Attractor struct
+  glm::vec3 position;
+  float mass;
+  int state; // >0 for repulsor, <=0 for attractor state 
+};
 
-//uniform_real_distribution<float>* vdistribution;
+
+static default_random_engine generator;
 
 class ParticleSystem {
   protected:
@@ -55,6 +59,8 @@ class ParticleSystem {
     float angle;
     // Update variables
     float gravity;
+    float airResistance;
+    glm::vec3 wind;
     // Transformation variables
     glm::vec4 position; // for translation
     glm::vec4 direction; // for rotation

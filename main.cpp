@@ -64,6 +64,7 @@ Camera cam;
 vector<unique_ptr<Obj>> objs;
 
 vector<unique_ptr<ParticleSystem>> ps;
+vector<unique_ptr<struct Repulsor>> repulsors;
 
 
 // Frame rate
@@ -231,6 +232,23 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   }
 }
 
+Repulsor* makeRepulsor(string filename) {
+  struct Repulsor* repulsor = new Repulsor;
+  char* input = (char*) filename.c_str();
+  char* tmp = strtok(input, " ");
+  if((tmp = strtok(NULL, " ")) != NULL)
+    repulsor->position[0] = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    repulsor->position[1] = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    repulsor->position[2] = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    repulsor->mass = atof(tmp);
+  if((tmp = strtok(NULL, " ")) != NULL)
+    repulsor->state = atoi(tmp);
+  return repulsor;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief constructBuffers
 void
@@ -310,6 +328,7 @@ draw() {
 
 
   glPointSize(5);
+  glEnable(GL_POINT_SMOOTH);
 
 
 
@@ -351,7 +370,6 @@ draw() {
 
   for(int i = 0; i < ps.size(); i++) {
     glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
     glPushMatrix();
     glScalef((GLfloat) ps.at(i)->getScale(0), (GLfloat) ps.at(i)->getScale(1), (GLfloat) ps.at(i)->getScale(2));
     glRotatef((GLfloat) ps.at(i)->getRotation(0), (GLfloat) ps.at(i)->getRotation(1), (GLfloat) ps.at(i)->getRotation(2), (GLfloat) ps.at(i)->getRotation(3));
@@ -366,6 +384,16 @@ draw() {
 
     glPopMatrix();
   }
+
+  // Draw Repulsors/Attractors
+  glPointSize(20);
+  glColor3f(.0f, .0f, .0f);
+  glBegin(GL_POINTS);
+  for(int i = 0; i < repulsors.size(); i++) {
+    glVertex3f((GLfloat) repulsors.at(i)->position[0], (GLfloat) repulsors.at(i)->position[1], (GLfloat) repulsors.at(i)->position[2]);
+  }
+  glEnd();
+
   glColor3f(.376f, .502f, .220f);
   glBegin(GL_QUADS);
   glVertex3f(-40, -5, -40);
@@ -396,18 +424,25 @@ void parse(const char* file, const char* debug) {
   string obj = ".obj";
   size_t foundobj;
   size_t foundpar;
+  size_t foundrep;
   while(getline(objFile, filename)) {
     foundobj = filename.find(".obj");
     foundpar = filename.find(".par");
-    if(foundobj == string::npos && foundpar != string::npos) {
+    foundrep = filename.find(".rep");
+    if(foundrep == string::npos && foundobj == string::npos && foundpar != string::npos) {
       ps.emplace_back(new ParticleSystem(filename));
       printf("Particle System: %s\n", filename.c_str());
       ps.back()->print();
     }
-    else if(foundobj != string::npos && foundpar == string::npos)  {
+    else if(foundobj != string::npos && foundpar == string::npos && foundrep == string::npos)  {
       objs.emplace_back(new Obj(filename));
       printf("Object: %s\n", filename.c_str());
       objs.back()->print(atoi(debug));
+    }
+    else if(foundobj == string::npos && foundpar == string::npos && foundrep != string::npos)  {
+      repulsors.emplace_back(makeRepulsor(filename));
+      printf("Repulsor: %s\n", filename.c_str());
+      //repulsors.back()->print();
     }
   }
   objFile.close();

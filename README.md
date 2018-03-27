@@ -114,3 +114,5 @@ TODO get cone initial velocity generation working, find out why gravity goes to 
 Add 2 more forces and an attractor/repulsor
 forces could be wind and air resistance
 attractor could be vacuum in the sky/black hole
+
+For attractor use gravity equation F = m1m2... and solve for acceleration
