@@ -12,8 +12,13 @@ d - look right
 e - zoom in
 q - zoom out
 r - reset camera
-i - look left beta
-o - look right beta
+y - change selected repulsor
+u - move repulsor[rep] up
+i - move repulsor[rep] left
+o - move repulsor[rep] right
+p - move repulsor[rep] down
+[ - move repulsor[rep] closer
+] - move repulsor[rep] further
 
 <filename.obj> tx ty tz rx ry rz sx sy sz cr cg cb
 tx float x translation in scene

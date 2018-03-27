@@ -65,6 +65,7 @@ vector<unique_ptr<Obj>> objs;
 
 vector<unique_ptr<ParticleSystem>> ps;
 vector<struct Repulsor> repulsors;
+int rep = 0;
 
 
 // Frame rate
@@ -156,11 +157,40 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       std::cout << "Model Display: Points" << std::endl;
       glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
       break;
-    case 111:       // o    rotate right
-      cam.hLook(.2);
+    case 121:       // y    switch to next repulsor/attractor
+      //cam.hLook(.2);
+      rep = (rep+1) % repulsors.size();
+      printf("%u\n", rep);
       break;
-    case 105:       // i    rotate left
-      cam.hLook(-.2);
+    case 117:       // u    move repulsor left
+      //cam.hLook(.2);
+      if(repulsors.size() > rep)
+        repulsors[rep].position[0] -= 1;
+      break;
+    case 105:       // i    move repulsor down
+      //cam.hLook(-.2);
+      if(repulsors.size() > rep)
+        repulsors[rep].position[1] -= 1;
+      break;
+    case 111:       // o    move repulsor up
+      //cam.hLook(.2);
+      if(repulsors.size() > rep)
+        repulsors[rep].position[1] += 1;
+      break;
+    case 112:       // p    move repulsor right
+      //cam.hLook(.2);
+      if(repulsors.size() > rep)
+        repulsors[rep].position[0] += 1;
+      break;
+    case 91:       // [    move repulsor closer
+      //cam.hLook(.2);
+      if(repulsors.size() > rep)
+        repulsors[rep].position[2] += 1;
+      break;
+    case 93:       // ]    move repulsor further away
+      //cam.hLook(.2);
+      if(repulsors.size() > rep)
+        repulsors[rep].position[2] -= 1;
       break;
     case 119:       // w    look up
       cam.at(1, 0.5);
@@ -188,9 +218,6 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       //case 116:       // t    test transform
       //  cam.mTransform();
       //  break;
-    case 117:       // u    test hLook
-      cam.hLook(.1);
-      break;
       // Unhandled
     default:
       std::cout << "Unhandled key: " << (int)(_key) << std::endl;
@@ -390,17 +417,18 @@ draw() {
   glColor3f(.0f, .0f, .0f);
   glBegin(GL_POINTS);
   for(int i = 0; i < repulsors.size(); i++) {
+  glColor3f((GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state);
     glVertex3f((GLfloat) repulsors.at(i).position[0], (GLfloat) repulsors.at(i).position[1], (GLfloat) repulsors.at(i).position[2]);
   }
   glEnd();
 
-  glColor3f(.376f, .502f, .220f);
-  glBegin(GL_QUADS);
-  glVertex3f(-40, -5, -40);
-  glVertex3f(-40, -5, 40);
-  glVertex3f(40, -5, 40);
-  glVertex3f(40, -5, -40);
-  glEnd();
+//glColor3f(.376f, .502f, .220f);
+//glBegin(GL_QUADS);
+//glVertex3f(-40, -5, -40);
+//glVertex3f(-40, -5, 40);
+//glVertex3f(40, -5, 40);
+//glVertex3f(40, -5, -40);
+//glEnd();
 
 
 

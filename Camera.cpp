@@ -40,11 +40,11 @@ Camera::
 reset() {
   g_theta = 0.f;
   m_eye[0] = 0;
-  m_eye[1] = 10;
-  m_eye[2] = 20;
+  m_eye[1] = 20;
+  m_eye[2] = 60;
 
   m_at[0] = 0;
-  m_at[1] = 0;
+  m_at[1] = 15;
   m_at[2] = 0;
 
   c_theta[0] = 0;
