@@ -110,3 +110,7 @@ textbook pg. 726 actual or 719 tb
 TODO Fix bug, check 'in loop, in loop 3' error
 
 TODO get cone initial velocity generation working, find out why gravity goes to the leftish
+
+Add 2 more forces and an attractor/repulsor
+forces could be wind and air resistance
+attractor could be vacuum in the sky/black hole

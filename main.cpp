@@ -86,7 +86,7 @@ vector<GLuint> ebos;
 /// @brief Initialize GL settings
 void
 initialize() {
-  glClearColor(0.f, 0.f, 0.4f, 0.f);
+  glClearColor(0.329f, 0.419f, 0.670f, 0.f);
   glEnable(GL_COLOR_MATERIAL);
   glEnable(GL_DEPTH_TEST);
 }
@@ -309,33 +309,42 @@ draw() {
   //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
 
-  //glColor3f(0.6f, 0.f, 0.f);
-  glPointSize(10);
+  glPointSize(5);
 
 
 
   for(int i = 0; i < objs.size(); i++) {
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
     //glLoadIdentity();
     glPushMatrix();
-    glTranslatef((GLfloat) objs[i]->getPosition(0), (GLfloat) objs[i]->getPosition(1), (GLfloat) objs[i]->getPosition(2));
-    glRotatef((GLfloat) objs[i]->getRotation(0), (GLfloat) objs[i]->getRotation(1), (GLfloat) objs[i]->getRotation(2), (GLfloat) objs[i]->getRotation(3));
-
+    // Translation
+    glTranslatef((GLfloat) objs[i]->getPosition(0), (GLfloat)
+        objs[i]->getPosition(1), (GLfloat) objs[i]->getPosition(2));
+    // Rotation
+    // Rotate X
+    glRotatef((GLfloat) objs[i]->getRotation(0), (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+    // Rotate Y
+    glRotatef((GLfloat) objs[i]->getRotation(1), (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+    // Rotate Z
+    glRotatef((GLfloat) objs[i]->getRotation(2), (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+    // Scale 
+    glScalef((GLfloat) objs[i]->getScale(0), (GLfloat) objs[i]->getScale(1),
+        (GLfloat) objs[i]->getScale(2));
+    // Color
     glColor3f(objs[i]->getColor(0), objs[i]->getColor(1), objs[i]->getColor(2));
 
-
+    // Get Data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]); // Bind EBO
     glBindBuffer(GL_ARRAY_BUFFER, vbos[i]); // Bind VBO
-
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, sizeof(VEC6), (GLvoid*)NULL);
-
     glEnableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_FLOAT, sizeof(VEC6), (GLvoid*)(sizeof(glm::vec3)));
 
-    if(objs[i]->getMode() == 4) 
+    // Draw
+    if(objs[i]->getMode() == 4) // Quads
       glDrawElements(GL_QUADS, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
-    else 
+    else                        // Triangles
       glDrawElements(GL_TRIANGLES, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
     glPopMatrix();
   }
@@ -344,29 +353,26 @@ draw() {
     glMatrixMode(GL_MODELVIEW);
     //glLoadIdentity();
     glPushMatrix();
-    //glTranslatef((GLfloat) objs[i]->getPosition(0), (GLfloat) objs[i]->getPosition(1), (GLfloat) objs[i]->getPosition(2));
-    //glRotatef((GLfloat) objs[i]->getRotation(0), (GLfloat) objs[i]->getRotation(1), (GLfloat) objs[i]->getRotation(2), (GLfloat) objs[i]->getRotation(3));
+    glScalef((GLfloat) ps.at(i)->getScale(0), (GLfloat) ps.at(i)->getScale(1), (GLfloat) ps.at(i)->getScale(2));
+    glRotatef((GLfloat) ps.at(i)->getRotation(0), (GLfloat) ps.at(i)->getRotation(1), (GLfloat) ps.at(i)->getRotation(2), (GLfloat) ps.at(i)->getRotation(3));
+    glTranslatef((GLfloat) ps.at(i)->getPosition(0), (GLfloat) ps.at(i)->getPosition(1), (GLfloat) ps.at(i)->getPosition(2));
     
     //ps[i]->printData();
 
-    // draw here
-    //const vector<Particle>* p = ps[i]->getData();
+    // draw 
     ps.at(i)->draw();
+    // update
     ps.at(i)->update();
-  //glBegin(GL_POINTS);
-  //for(int j = 0; j < ps.at(i)->getNumParticles(); i++) {
-  //  printf("in loop\n");
 
-  //  //printf("%f\t%f\t%f\n", (GLfloat)ps.at(i)->getParticle(j).color[0], (GLfloat)ps.at(i)->getParticle(j).color[1], (GLfloat)ps.at(i)->getParticle(j).color[2]); 
-  //  //glColor3f((GLfloat)ps.at(i)->getParticle(j).color[0], (GLfloat)ps.at(i)->getParticle(j).color[1], (GLfloat)ps.at(i)->getParticle(j).color[2]); 
-  //  printf("%f\n", (GLfloat) ps.at(i)->pos(j,0)); //(GLfloat)ps.at(i)->getParticle(j)->position[1], (GLfloat)ps.at(i)->getParticle(j)->position[2]); 
-  //  printf("%f\t%f\t%f\n", (GLfloat) ps.at(i)->getParticle(j)->position[0], (GLfloat)ps.at(i)->getParticle(j)->position[1], (GLfloat)ps.at(i)->getParticle(j)->position[2]); 
-  //  glVertex3f((GLfloat)ps.at(i)->getParticle(j)->position[0], (GLfloat)ps.at(i)->getParticle(j)->position[1], (GLfloat)ps.at(i)->getParticle(j)->position[2]);
-  //  printf("in loop3\n");
-  //}
-  //glEnd();
     glPopMatrix();
   }
+  glColor3f(.376f, .502f, .220f);
+  glBegin(GL_QUADS);
+  glVertex3f(-40, -5, -40);
+  glVertex3f(-40, -5, 40);
+  glVertex3f(40, -5, 40);
+  glVertex3f(40, -5, -40);
+  glEnd();
 
 
 

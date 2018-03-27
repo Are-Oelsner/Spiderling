@@ -74,8 +74,13 @@ glm::vec3
 ParticleSystem::
 genVelocity() {
   uniform_real_distribution<float> vdistribution(vmin, vmax);
-  //float velocity = vdistribution(generator);
-  return glm::vec3(0.f, vdistribution(generator), 0.f); //TODO add random direction
+  uniform_real_distribution<float> rdistribution(0, angle);
+  uniform_real_distribution<float> adistribution(0, 2*M_PI);
+  float r = rdistribution(generator);
+  float a = adistribution(generator);
+  float x = r*cos(a);
+  float z = r*sin(a);
+  return glm::vec3(x, vdistribution(generator), z); //TODO add random direction
 }
 
 glm::vec3 
@@ -105,7 +110,7 @@ update() {
       data[i] = genParticle();
     else {
       data[i].position = data[i].position + data[i].velocity; //TODO include timestep
-      data[i].velocity += gravity;
+      data[i].velocity[1] += gravity;
       data[i].color = genColor(data[i].time);
       data[i].time++;
     }

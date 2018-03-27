@@ -11,8 +11,6 @@ Obj(string input) {
   loadOBJ(filename);
   constructData();
   initTransforms();
-  position = glm::vec4(0., 0., 0., 1.);
-  m_tran = glm::vec3(0., 0., 0.);
 }
 
 Obj::

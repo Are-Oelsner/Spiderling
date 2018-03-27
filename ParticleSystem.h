@@ -23,6 +23,7 @@
 #include <string>
 #include <string.h>
 #include <random>
+#include <math.h>
 
 using namespace std;
 
@@ -72,6 +73,11 @@ class ParticleSystem {
     glm::vec3 genPosition();
     glm::vec3 genVelocity();
     glm::vec3 genColor(int time);
+
+    float getPosition(int i) {return position[i];}
+    float getRotation(int i) {return direction[i];}
+    float getScale(int i) {return size[i];}
+
     int genTime();
     void update();
     void draw();

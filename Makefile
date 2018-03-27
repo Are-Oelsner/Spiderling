@@ -64,7 +64,7 @@ clean:
 ## My Stuff
 ################################################################################
 o:
-	vim main.cpp +":tabf ParticleSystem.cpp" +":vsplit ParticleSystem.h" +":tabf Obj.cpp" +":vsplit Obj.h" +":tabf Camera.cpp" +":vsplit Camera.h" +":tabf Vec.cpp" +":vsplit Vec.h" +":tabf README.md" +"gt"
+	vim main.cpp +":tabf ParticleSystem.cpp" +":vsplit ParticleSystem.h" +":tabf Obj.cpp" +":vsplit Obj.h" +":tabf Camera.cpp" +":vsplit Camera.h" +":tabf Vec.cpp" +":vsplit Vec.h" +":tabf README.md" + gt
 
 pdf:
 	evince Project1.pdf
@@ -81,6 +81,9 @@ r1:
 
 s:
 	./spiderling obj1.dat 0
+
+p:
+	./spiderling PS.dat 0
 
 s1:
 	./spiderling obj1.dat 1
