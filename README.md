@@ -156,3 +156,11 @@ forces could be wind and air resistance
 attractor could be vacuum in the sky/black hole
 
 For attractor use gravity equation F = m1m2... and solve for acceleration
+
+Project 4 Details
+
+Don't need to write image loader
+can use qt or soil or anything I want
+only need to support 1 material per obj
+
+//Personal -- add lots of cool models
