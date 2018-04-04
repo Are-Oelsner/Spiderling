@@ -13,10 +13,6 @@ Obj(string input) {
   initTransforms();
 }
 
-Obj::
-~Obj() {
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 ///Functions
 const vector<VEC6>&
@@ -29,32 +25,32 @@ Obj::getIndices() {
   return indices;
 }
 
-const vector<glm::vec3>&
+const vector<glm::vec3>
 Obj::getVertices() {
   return vertices;
 }
 
-const vector<unsigned int>&
+const vector<unsigned int>
 Obj::getVertexIndices() {
   return vertexIndices;
 }
 
-const vector<glm::vec2>&
+const vector<glm::vec2>
 Obj::getUvs() {
   return uvs;
 }
 
-const vector<unsigned int>&
+const vector<unsigned int>
 Obj::getUvIndices() {
   return uvIndices;
 }
 
-const vector<glm::vec3>&
+const vector<glm::vec3>
 Obj::getNormals() {
   return normals;
 }
 
-const vector<unsigned int>&
+const vector<unsigned int>
 Obj::getNormalIndices() {
   return normalIndices;
 }
@@ -79,6 +75,7 @@ loadOBJ(const char *filename) {
   std::vector<glm::vec3> tmp_vertices;
   std::vector<glm::vec2> tmp_uvs;
   std::vector<glm::vec3> tmp_normals;
+  string mtlFile;
   FILE *file = fopen(filename, "r");
   if(file == NULL) {
     printf("Cannot open the file !\n");
@@ -90,6 +87,12 @@ loadOBJ(const char *filename) {
     // if end of file is reached, break
     if(res == EOF)
       break;
+    // Mtllib
+    if(strcmp(lineHeader, "mtllib") == 0) {
+      char mtl[100];
+      int tmp = fscanf(file, "%s\n", &mtl);
+      printf("%s\n", mtl);
+    }
     // Vertices
     if(strcmp(lineHeader, "v") == 0) {
       glm::vec3 vertex;

@@ -71,30 +71,29 @@ class ParticleSystem {
     ParticleSystem();
     ParticleSystem(string filename);
 
-    ~ParticleSystem() {}
+    ///Funtions
+    glm::vec4 getPosition() {return position;}
+    glm::vec4 getRotation() {return direction;}
+    glm::vec4 getScale() {return size;}
 
-
-    ///Functions
-    Particle genParticle();
-    glm::vec3 genPosition();
-    glm::vec3 genVelocity();
-    glm::vec3 genColor(int time);
-
-    float getPosition(int i) {return position[i];}
-    float getRotation(int i) {return direction[i];}
-    float getScale(int i) {return size[i];}
-
-    int genTime();
     void update(const vector<Repulsor> repulsors);
     void draw();
     void print();
     void printData();
 
     //Getters
-    const vector<Particle>* getData() {return &data;}
-    const Particle* getParticle(int i) {return &data.at(i);}
-    float pos(int i, int j) {return data.at(i).position[j];}
+    const vector<Particle>& getData() {return data;}
+    const Particle& getParticle(int i) {return data[i];}
+    float pos(int i, int j) {return data[i].position[j];}
     int getNumParticles() {return numParticles;}
+
+  private:
+    ///Private Functions
+    Particle genParticle();
+    glm::vec3 genPosition();
+    glm::vec3 genVelocity();
+    glm::vec3 genColor(int time);
+    int genTime();
 
 };
 

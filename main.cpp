@@ -364,20 +364,20 @@ draw() {
     //glLoadIdentity();
     glPushMatrix();
     // Translation
-    glTranslatef((GLfloat) objs[i]->getPosition(0), (GLfloat)
-        objs[i]->getPosition(1), (GLfloat) objs[i]->getPosition(2));
+    glTranslatef((GLfloat) objs[i]->getPosition()[0], (GLfloat)
+        objs[i]->getPosition()[1], (GLfloat) objs[i]->getPosition()[2]);
     // Rotation
     // Rotate X
-    glRotatef((GLfloat) objs[i]->getRotation(0), (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+    glRotatef((GLfloat) objs[i]->getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
     // Rotate Y
-    glRotatef((GLfloat) objs[i]->getRotation(1), (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+    glRotatef((GLfloat) objs[i]->getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
     // Rotate Z
-    glRotatef((GLfloat) objs[i]->getRotation(2), (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+    glRotatef((GLfloat) objs[i]->getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
     // Scale 
-    glScalef((GLfloat) objs[i]->getScale(0), (GLfloat) objs[i]->getScale(1),
-        (GLfloat) objs[i]->getScale(2));
+    glScalef((GLfloat) objs[i]->getScale()[0], (GLfloat) objs[i]->getScale()[1],
+        (GLfloat) objs[i]->getScale()[2]);
     // Color
-    glColor3f(objs[i]->getColor(0), objs[i]->getColor(1), objs[i]->getColor(2));
+    glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
 
     // Get Data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]); // Bind EBO
@@ -398,16 +398,25 @@ draw() {
   for(int i = 0; i < ps.size(); i++) {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glScalef((GLfloat) ps.at(i)->getScale(0), (GLfloat) ps.at(i)->getScale(1), (GLfloat) ps.at(i)->getScale(2));
-    glRotatef((GLfloat) ps.at(i)->getRotation(0), (GLfloat) ps.at(i)->getRotation(1), (GLfloat) ps.at(i)->getRotation(2), (GLfloat) ps.at(i)->getRotation(3));
-    glTranslatef((GLfloat) ps.at(i)->getPosition(0), (GLfloat) ps.at(i)->getPosition(1), (GLfloat) ps.at(i)->getPosition(2));
+
+    // Translate
+    glTranslatef((GLfloat) ps[i]->getPosition()[0], (GLfloat) ps[i]->getPosition()[1], (GLfloat) ps[i]->getPosition()[2]);
+    // Rotation
+    // Rotate X
+    glRotatef((GLfloat) ps[i]->getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+    // Rotate Y
+    glRotatef((GLfloat) ps[i]->getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+    // Rotate Z
+    glRotatef((GLfloat) ps[i]->getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+    // Scale
+    glScalef((GLfloat) ps[i]->getScale()[0], (GLfloat) ps[i]->getScale()[1], (GLfloat) ps[i]->getScale()[2]);
     
     //ps[i]->printData();
 
     // draw 
-    ps.at(i)->draw();
+    ps[i]->draw();
     // update
-    ps.at(i)->update(repulsors);
+    ps[i]->update(repulsors);
 
     glPopMatrix();
   }

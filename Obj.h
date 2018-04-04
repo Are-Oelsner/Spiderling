@@ -63,8 +63,6 @@ class Obj {
     Obj() {}
     Obj(string filename);
 
-    ~Obj();
-
 
     ///Functions
 
@@ -76,40 +74,29 @@ class Obj {
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
     bool loadOBJ(const char *filename);
 
-    char* parseInput(char* input);
-
-    void constructData();
-
-    void initTransforms();
-
-    void setMode(int m);
-
     void print(bool debug);
 
     //Getters
     const vector<VEC6>& getData();
     const vector<unsigned int>& getIndices();
 
-    glm::vec4* getPosition() {return &position;}
-    float getPosition(int i) {return position[i];}
+    glm::vec4 getPosition() {return position;}
     void setPosition(glm::vec4 vec) {position = vec;}
     void setPosition(float x, float y, float z) {position = glm::vec4(x, y, z, 1);}
 
-    glm::vec4* getRotation() {return &orientation;}
-    float getRotation(int i) {return orientation[i];}
+    glm::vec4 getRotation() {return orientation;}
     void setRotation(glm::vec4 vec) {orientation = vec;}
     void setRotation(float x, float y, float z) {orientation = glm::vec4(x, y, z, 1);}
 
-    glm::vec4* getScale() {return &size;}
-    float getScale(int i) {return size[i];}
+    glm::vec4 getScale() {return size;}
     void setScale(glm::vec4 vec) {size = vec;}
     void setScale(float x, float y, float z) {size = glm::vec4(x, y, z, 1);}
 
-    glm::mat4* getTranslationM() {return &m_translation;}
-    glm::mat4* getRotationM() {return &m_rotation;}
-    glm::mat4* getScaleM() {return &m_scale;}
+    glm::mat4 getTranslationM() {return m_translation;}
+    glm::mat4 getRotationM() {return m_rotation;}
+    glm::mat4 getScaleM() {return m_scale;}
 
-    glm::vec3* getTran() {return &m_tran;}
+    glm::vec3 getTran() {return m_tran;}
 
     glm::vec4 translate(float tx, float ty, float tz);
     glm::vec4 rotate(int i, float theta);
@@ -118,7 +105,6 @@ class Obj {
     int getMode() {return mode;}
 
     glm::vec4 getColor() {return m_color;}
-    float getColor(int i) {return m_color[i];}
     void setColor(float r, float g, float b) {m_color = glm::vec4(r, g, b, 0);}
     void setColor(glm::vec4 color) {m_color = color;}
 
@@ -126,12 +112,20 @@ class Obj {
   protected:
     ////////////////////////////////////////////////////////////////////////////////
     /// Helper Functions
-    const vector<glm::vec3>& getVertices();
-    const vector<unsigned int>& getVertexIndices();
-    const vector<glm::vec2>& getUvs();
-    const vector<unsigned int>& getUvIndices();
-    const vector<glm::vec3>& getNormals();
-    const vector<unsigned int>& getNormalIndices();
+    const vector<glm::vec3> getVertices();
+    const vector<unsigned int> getVertexIndices();
+    const vector<glm::vec2> getUvs();
+    const vector<unsigned int> getUvIndices();
+    const vector<glm::vec3> getNormals();
+    const vector<unsigned int> getNormalIndices();
+
+    char* parseInput(char* input);
+
+    void constructData();
+
+    void initTransforms();
+
+    void setMode(int m);
 };
 
 #endif
