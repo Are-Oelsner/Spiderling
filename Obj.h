@@ -9,6 +9,8 @@
 #include <map>
 #include <stdexcept>
 #include <string>
+//#include <qt5/QtCore/qbytearray.h>
+#include <QtGui/QImageReader>
 
 #include "Vec.h"
 

@@ -23,7 +23,7 @@ endif
 ################################################################################
 # Open gl
 ifeq "$(OS)" "LINUX"
-  GL_LIBS = -lglut -lGLU -lGL -lGLEW
+  GL_LIBS = -lglut -lGLU -lGL -lGLEW -lQt5Gui
 else
   ifeq "$(OS)" "OSX"
   GL_LIBS = -framework GLUT -framework OpenGL
@@ -48,13 +48,13 @@ EXECUTABLE = spiderling
 default: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJS) $(OBJMOC)
-	$(CC) $(OPTS) $(FLAGS) $(DEFS) $(OBJS) $(LIBS) -o $(EXECUTABLE)
+	$(CC) $(OPTS) -I /usr/include/x86_64-linux-gnu/qt5 -fPIC $(FLAGS) $(DEFS) $(OBJS) $(LIBS) -o $(EXECUTABLE)
 
 clean:
 	rm -f $(EXECUTABLE) $(OBJS)
 
 .cpp.o:
-	$(CC) $(OPTS) $(DEFS) -MMD $(INCL) -c $< -o $@
+	$(CC) $(OPTS) -I /usr/include/x86_64-linux-gnu/qt5 -fPIC $(DEFS) -MMD $(INCL) -c $< -o $@
 	cat $*.d >> Dependencies
 	rm -f $*.d
 

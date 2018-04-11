@@ -164,3 +164,7 @@ can use qt or soil or anything I want
 only need to support 1 material per obj
 
 //Personal -- add lots of cool models
+
+Project 4//////////////////////////////////////////////////////////
+look into qt image reader class link on proj4 pdf.
+Check back with jory about qt error.
