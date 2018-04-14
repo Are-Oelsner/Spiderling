@@ -1,4 +1,7 @@
 #include "Obj.h"
+#include <sstream>
+#include <string.h>
+#include <stdexcept>
 
 using namespace std;
 
@@ -15,7 +18,7 @@ Obj(string input) {
 
 ////////////////////////////////////////////////////////////////////////////////
 ///Functions
-const vector<VEC6>&
+const vector<VEC8>&
 Obj::getData() {
   return data;
 }
@@ -67,7 +70,7 @@ setMode(int m) {
 /// v : vertex, vt : texture coordinate (TODO), vn : vertex normal, f : face. 
 ///
 /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
-bool 
+void
 Obj::
 loadOBJ(const char *filename) {
   // Temp storage for contents of obj file
@@ -77,9 +80,10 @@ loadOBJ(const char *filename) {
   std::vector<glm::vec3> tmp_normals;
   string mtlFile;
   FILE *file = fopen(filename, "r");
+  int tmp;
   if(file == NULL) {
     printf("Cannot open the file !\n");
-    return false;
+    return;
   }
   while(true) {
     char lineHeader[256];
@@ -90,25 +94,25 @@ loadOBJ(const char *filename) {
     // Mtllib
     if(strcmp(lineHeader, "mtllib") == 0) {
       char mtl[100];
-      int tmp = fscanf(file, "%s\n", &mtl);
+      tmp = fscanf(file, "%s\n", mtl);
       printf("%s\n", mtl);
     }
     // Vertices
     if(strcmp(lineHeader, "v") == 0) {
       glm::vec3 vertex;
-      int tmp = fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
+      tmp=fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
       vertices.push_back(vertex);
     }
     // Vertex Textures -- Don't need for now TODO
     else if(strcmp(lineHeader, "vt") == 0) {
       glm::vec2 uv;
-      int tmp = fscanf(file, "%f %f\n", &uv.x, &uv.y);
+      tmp = fscanf(file, "%f %f\n", &uv.x, &uv.y);
       uvs.push_back(uv);
     }
     // Vertex Normals
     else if(strcmp(lineHeader, "vn") == 0) {
       glm::vec3 normal;
-      int tmp = fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
+      tmp = fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
       normals.push_back(normal);
     }
     // Faces
@@ -117,7 +121,7 @@ loadOBJ(const char *filename) {
       int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2], &vertexIndex[3], &uvIndex[3], &normalIndex[3]);
       if((matches % 3) !=  0) {
         printf("Error: File cannot be read, an incorrect number of vertices, uvs, and normals was provided\n");
-        return false;
+        return;
       }
 
       if(matches == 9) {
@@ -151,6 +155,7 @@ loadOBJ(const char *filename) {
 
     }
   }
+  fclose(file);
   /// Indexing
   // Vertex Indexing
   for(unsigned int i = 0; i < vertexIndexList.size(); i++) {
@@ -167,7 +172,6 @@ loadOBJ(const char *filename) {
     unsigned int normalIndex = normalIndexList[i];
     normalIndices.push_back(normalIndex-1); 
   }
-  fclose(file);
 }
 
 char*
@@ -212,11 +216,11 @@ Obj::
 print(bool debug) {
   printf("mode: %u\t#vertices: %lu\t#uvs: %lu\t#normals: %lu\n#faces: %lu\t#vertIndices: %lu\ndata: %lu\tindices:%lu\n\n", mode, vertices.size(), uvs.size(), normals.size(), vertices.size()/mode, vertexIndices.size(), data.size(), indices.size());
   if(debug) {
-    for(int i = 0; i < indices.size(); i++) {
+    for(int i = 0; i < (int)indices.size(); i++) {
       printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);
     }
     printf("Data: %lu\n", data.size());
-    for(int i = 0; i < data.size(); i++) {
+    for(int i = 0; i < (int)data.size(); i++) {
       printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", i, data[i].vert[0], data[i].norm[0], data[i].vert[1], data[i].norm[1], data[i].vert[2], data[i].norm[2]);
     }
   }
@@ -227,9 +231,9 @@ Obj::
 constructData() {
   pair<unsigned int, unsigned int> ind; // pair of vertex index / corresponding normal index
   unsigned int index = 0;               // index of new indices 
-  VEC6 tmp;                             // VEC6 of vertex/normal info to be pushed back to data
+  VEC8 tmp;                             // VEC8 of vertex/normal/texture info to be pushed back to data
 
-  for(int i = 0; i < vertexIndices.size(); i++) {
+  for(int i = 0; i < (int)vertexIndices.size(); i++) {
     ind = pair<unsigned int, unsigned int>(vertexIndices[i], normalIndices[i]);
     // If pair is not already in list, adds it
     try{indexMap.at(ind);} catch (const std::out_of_range& oor) { 

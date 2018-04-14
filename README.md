@@ -168,3 +168,7 @@ only need to support 1 material per obj
 Project 4//////////////////////////////////////////////////////////
 look into qt image reader class link on proj4 pdf.
 Check back with jory about qt error.
+
+move includes to the file they are used in, ex to the cpp if theyre only used in the cpp
+QGlWidget has function convert to gl format which I will pass in the data from imagereader, which will then
+returns qimage , then use the above function to put it in gl format but will still be a qimage. Pass array contents of the qimage to the opengl function.

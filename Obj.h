@@ -1,24 +1,21 @@
 #ifndef __OBJ_H__
 #define __OBJ_H__
 
+#include <QtGui/QImageReader>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vector>
-#include <sstream>
-#include <string.h>
 #include <map>
-#include <stdexcept>
 #include <string>
-//#include <qt5/QtCore/qbytearray.h>
-#include <QtGui/QImageReader>
 
 #include "Vec.h"
 
 using namespace std;
 
-struct VEC6 { // VEC6 struct type made up of two glm::vec3s to store vertex + normal info
+struct VEC8 { // VEC8 struct type made up of two glm::vec3s to store vertex + normal info and a vec2
   glm::vec3 vert;
   glm::vec3 norm;
+  glm::vec2 text;
 };
 
 class Obj {
@@ -29,7 +26,7 @@ class Obj {
 
     // Final Data
     // Vertex-Normal Pairs
-    vector<VEC6> data;
+    vector<VEC8> data;
     // Final index list
     vector<unsigned int> indices;
 
@@ -74,12 +71,12 @@ class Obj {
     /// v : vertex, vt : texture coordinate (TODO), vn : vertex normal, f : face. 
     ///
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
-    bool loadOBJ(const char *filename);
+    void loadOBJ(const char *filename);
 
     void print(bool debug);
 
     //Getters
-    const vector<VEC6>& getData();
+    const vector<VEC8>& getData();
     const vector<unsigned int>& getIndices();
 
     glm::vec4 getPosition() {return position;}

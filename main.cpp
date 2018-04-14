@@ -13,6 +13,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 
+// My Files
+#include "Obj.h"
+#include "WindowClass.h"
+#include "Camera.h"
+#include "ParticleSystem.h"
+
 // STL
 #include <cmath>
 #include <chrono>
@@ -40,12 +46,6 @@
 #endif
 
 // GLM - included in Obj
-
-// My Files
-#include "Obj.h"
-#include "WindowClass.h"
-#include "Camera.h"
-#include "ParticleSystem.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Spiderling Objects

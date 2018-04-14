@@ -9,7 +9,7 @@ OS = LINUX
 CC = g++ -std=c++14
 OPTS = -O3
 #OPTS = -g
-FLAGS = -Wall -Werror
+FLAGS = -fPIC #-Wall -Werror 
 ifeq "$(OS)" "LINUX"
   DEFS = -DLINUX
 else
@@ -33,7 +33,7 @@ endif
 ################################################################################
 ## Rules
 ################################################################################
-INCL = $(GL_INCL)
+INCL = $(GL_INCL) -I /usr/include/x86_64-linux-gnu/qt5 
 LIBS = $(GL_LIBS)
 
 OBJS = WindowClass.o\
@@ -48,13 +48,13 @@ EXECUTABLE = spiderling
 default: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJS) $(OBJMOC)
-	$(CC) $(OPTS) -I /usr/include/x86_64-linux-gnu/qt5 -fPIC $(FLAGS) $(DEFS) $(OBJS) $(LIBS) -o $(EXECUTABLE)
+	$(CC) $(OPTS) $(FLAGS) $(DEFS) $(OBJS) $(LIBS) -o $(EXECUTABLE)
 
 clean:
 	rm -f $(EXECUTABLE) $(OBJS)
 
 .cpp.o:
-	$(CC) $(OPTS) -I /usr/include/x86_64-linux-gnu/qt5 -fPIC $(DEFS) -MMD $(INCL) -c $< -o $@
+	$(CC) $(OPTS) $(FLAGS) $(DEFS) -MMD $(INCL) -c $< -o $@
 	cat $*.d >> Dependencies
 	rm -f $*.d
 
