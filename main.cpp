@@ -304,7 +304,7 @@ constructBuffers() {
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VEC6)*objs[i]->getData().size(), objs[i]->getData().data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VEC8)*objs[i]->getData().size(), objs[i]->getData().data(), GL_STATIC_DRAW);
     vbos.emplace_back(vbo);
 
 
@@ -356,6 +356,7 @@ draw() {
 
   glPointSize(5);
   glEnable(GL_POINT_SMOOTH);
+  glEnable(GL_TEXTURE_2D);
 
 
 
@@ -377,15 +378,22 @@ draw() {
     glScalef((GLfloat) objs[i]->getScale()[0], (GLfloat) objs[i]->getScale()[1],
         (GLfloat) objs[i]->getScale()[2]);
     // Color
+    // TODO comment out when textures are implemented TODO
     glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
 
     // Get Data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]); // Bind EBO
     glBindBuffer(GL_ARRAY_BUFFER, vbos[i]); // Bind VBO
+
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, sizeof(VEC6), (GLvoid*)NULL);
+    glVertexPointer(3, GL_FLOAT, sizeof(VEC8), (GLvoid*)NULL);
+
     glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT, sizeof(VEC6), (GLvoid*)(sizeof(glm::vec3)));
+    glNormalPointer(GL_FLOAT, sizeof(VEC8), (GLvoid*)(sizeof(glm::vec3)));
+
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
+
 
     // Draw
     if(objs[i]->getMode() == 4) // Quads

@@ -18,6 +18,17 @@ struct VEC8 { // VEC8 struct type made up of two glm::vec3s to store vertex + no
   glm::vec2 text;
 };
 
+struct MTL { // Struct to store values from mtl file
+  glm::vec3 Ka;
+  glm::vec3 Kd;
+  glm::vec3 Ks;
+  float d; // transparency of the material/ also represented as Tr
+  float Ns; // shininess of the material
+  unsigned int illum; // represents illumination model 1:flat 2:specular highlights
+  char* map_Kd; // file containing texture map ex. .jpg
+};
+
+
 class Obj {
   protected:
     ////////////////////////////////////////////////////////////////////////////////
@@ -29,6 +40,8 @@ class Obj {
     vector<VEC8> data;
     // Final index list
     vector<unsigned int> indices;
+    // Material info
+    MTL material;
 
     // Map with key as vertex/normal pair and value as index number
     map<pair<unsigned int, unsigned int>, unsigned int> indexMap; 
@@ -72,6 +85,7 @@ class Obj {
     ///
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
     void loadOBJ(const char *filename);
+    void loadMTL(const char *filename);
 
     void print(bool debug);
 

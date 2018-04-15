@@ -78,7 +78,6 @@ loadOBJ(const char *filename) {
   std::vector<glm::vec3> tmp_vertices;
   std::vector<glm::vec2> tmp_uvs;
   std::vector<glm::vec3> tmp_normals;
-  string mtlFile;
   FILE *file = fopen(filename, "r");
   int tmp;
   if(file == NULL) {
@@ -95,6 +94,7 @@ loadOBJ(const char *filename) {
     if(strcmp(lineHeader, "mtllib") == 0) {
       char mtl[100];
       tmp = fscanf(file, "%s\n", mtl);
+      loadMTL(mtl);
       printf("%s\n", mtl);
     }
     // Vertices
@@ -174,6 +174,42 @@ loadOBJ(const char *filename) {
   }
 }
 
+void
+Obj::
+loadMTL(const char* filename) {
+  FILE *file = fopen(filename, "r");
+  int tmp;
+  if(file == NULL) {
+    printf("Cannot open the file !\n");
+    return;
+  }
+  while(true) {
+    char lineHeader[256];
+    int res = fscanf(file, "%s", lineHeader);
+    // if end of file is reached, break
+    if(res == EOF)
+      break;
+    // map_Ka / map_Kd
+    if(strcmp(lineHeader, "map_Ka") == 0 || strcmp(lineHeader, "map_Kd") == 0) {
+      tmp = fscanf(file, "%s\n", &material.map_Kd);
+      printf("%s\n", material.map_Kd);
+    }
+    // Ka TODO start here
+    if(strcmp(lineHeader, "v") == 0) {
+      glm::vec3 vertex;
+      tmp=fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
+      vertices.push_back(vertex);
+    }
+    // Vertex Textures -- Don't need for now TODO
+    else if(strcmp(lineHeader, "vt") == 0) {
+      glm::vec2 uv;
+      tmp = fscanf(file, "%f %f\n", &uv.x, &uv.y);
+      uvs.push_back(uv);
+    }
+  fclose(file);
+}
+
+
 char*
 Obj::
 parseInput(char* input) {
@@ -241,6 +277,7 @@ constructData() {
       indices.push_back(index);   
       tmp.vert = vertices[ind.first];
       tmp.norm = normals[ind.second];
+      tmp.text = uvs[uvIndices[i]];
       data.push_back(tmp);
       index++;
       continue;
