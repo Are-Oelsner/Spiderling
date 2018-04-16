@@ -80,6 +80,9 @@ float g_framesPerSecond{0.f};
 vector<GLuint> vbos;
 vector<GLuint> ebos;
 
+// Lights
+vector<unique_ptr<Light>> lights;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions

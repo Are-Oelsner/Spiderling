@@ -61,7 +61,7 @@ up - move camera up
 down - move camera down
 
 Lights
-light <position floatx floaty floatz <0/1 for directional/spot>> <
+light <position floatx floaty floatz (float 0/1 for directional/spot)> <direction floatx floaty floatz> <ambient floatx floaty floatz floatt> <diffuse floatx floaty floatz floatt> <specular floatx floaty floatz float t> <constant atten float> <linear atten float> <quadratic atten float> <angular atten float> <angular limit float>
 
 
 fill new vector<VEC6> data in Obj with vec3 of vertex info and vec3 of associated normal info for each pair in the indexed list/ change the index to reference back to already created points/normals if the pairing is repeated
@@ -180,3 +180,5 @@ returns qimage , then use the above function to put it in gl format but will sti
 Comment out colors in draw and remove from file with objlist and from obj class.
 Continue work on Obj.cpp line 197
 working on light.h line 28. Need to finish light constructors, light input parsing, adding light to 'obj' constructor in main, adding vector of shared pointer of lights to main, and then drawing lights appropriately based on type. Then need to finish mtl file stuff.
+
+Add in command line parser from networks project 1 for light data parser so I can specify with -char

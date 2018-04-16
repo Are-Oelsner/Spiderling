@@ -17,15 +17,19 @@ class Light {
     float linearAttenuation = 0.;     // linear attenuation away from spotlight
     float quadraticAttenuation = 0.;  // quadratic attenuation away from spotlight
     float angularAttenuation = 0.; // angular attenuation exponent between [0, 128]
-    float angularLimit = 180.;   // conical angle from direction in degrees, defaults to point light
+    float angularLimit = 180.;  // conical angle from direction in degrees, defaults to point light
 
   public:
     ///Constructors
     // Default Constructor
     Light();
 
+    // File Constructor 
+    Light(char* input);
+
     // Point Light Constructor
-    Light(glm::vec4 pos, glm::vec3 dir, glm::vec4 amb, glm::vec4 diff, glm::vec4 spec, float aLim);//TODO finish this
+    Light(glm::vec4 pos, glm::vec3 dir, glm::vec4 amb, glm::vec4 diff,
+        glm::vec4 spec, float aLim, float cAtten, float lAtten, float qAtten);
 
     // Directional Light Constructor
     Light(glm::vec4 pos, glm::vec3 dir, glm::vec4 amb, glm::vec4 diff, glm::vec4 spec); 
@@ -45,6 +49,11 @@ class Light {
     float getQAtten() {return quadraticAttenuation;}//returns quadratic attenuation
     float getAAtten() {return angularAttenuation;}  //returns angular attenuation
     float getAngularLimit() {return angularLimit;}  //returns angular attenuation
+
+  private:
+    ///Helper Functions
+    // Parse Light info  
+    char* parseInput(char* input);
 };
 
 #endif
