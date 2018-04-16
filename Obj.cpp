@@ -189,23 +189,36 @@ loadMTL(const char* filename) {
     // if end of file is reached, break
     if(res == EOF)
       break;
-    // map_Ka / map_Kd
-    if(strcmp(lineHeader, "map_Ka") == 0 || strcmp(lineHeader, "map_Kd") == 0) {
-      tmp = fscanf(file, "%s\n", &material.map_Kd);
+    // Ka 
+    else if(strcmp(lineHeader, "Ka") == 0) {
+      tmp=fscanf(file, "%f %f %f\n", &material.Ka.x, &material.Ka.y, &material.Ka.z);
+    }
+    // Kd
+    else if(strcmp(lineHeader, "Kd") == 0) {
+      tmp=fscanf(file, "%f %f %f\n", &material.Kd.x, &material.Kd.y, &material.Kd.z);
+    }
+    // Ks
+    else if(strcmp(lineHeader, "Ks") == 0) {
+      tmp=fscanf(file, "%f %f %f\n", &material.Ks.x, &material.Ks.y, &material.Ks.z);
+    }
+    // d
+    else if(strcmp(lineHeader, "d") == 0) {
+      tmp=fscanf(file, "%f\n", &material.d);
+    }
+    // Ns
+    else if(strcmp(lineHeader, "Ns") == 0) {
+      tmp=fscanf(file, "%f\n", &material.Ns);
+    }
+    // illum
+    else if(strcmp(lineHeader, "illum") == 0) {
+      tmp=fscanf(file, "%u\n", &material.illum);
+    }
+    // map_Kd
+    else if(strcmp(lineHeader, "map_Kd") == 0) {
+      tmp = fscanf(file, "%s\n", material.map_Kd);
       printf("%s\n", material.map_Kd);
     }
-    // Ka TODO start here
-    if(strcmp(lineHeader, "v") == 0) {
-      glm::vec3 vertex;
-      tmp=fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
-      vertices.push_back(vertex);
-    }
-    // Vertex Textures -- Don't need for now TODO
-    else if(strcmp(lineHeader, "vt") == 0) {
-      glm::vec2 uv;
-      tmp = fscanf(file, "%f %f\n", &uv.x, &uv.y);
-      uvs.push_back(uv);
-    }
+  }
   fclose(file);
 }
 

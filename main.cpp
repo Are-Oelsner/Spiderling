@@ -336,22 +336,47 @@ draw() {
   //////////////////////////////////////////////////////////////////////////////
   // Draw
 
-  // Single directional light
-  static GLfloat lightPosition[] = { 0.5f, 1.0f, 1.5f, 0.0f };
-  static GLfloat whiteLight[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-  static GLfloat darkLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-  glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-  glLightfv(GL_LIGHT0, GL_AMBIENT, darkLight);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, whiteLight);
-
   // Camera
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   gluLookAt(cam.eye(0), cam.eye(1), cam.eye(2), cam.at(0), cam.at(1), cam.at(2), cam.getUp(0), cam.getUp(1), cam.getUp(2)); 
   //gluLookAt(cam.eX()*std::sin(cam.theta(), cam.eY(), cam.eZ()*std::cos(cam.theta()),
   //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
+
+  // Lights
+  for(int i = 0; i < lights.size(); i++) {
+    glPushMatrix();
+    // Translation
+    glTranslatef((GLfloat) objs[i]->getPosition()[0], (GLfloat)
+        objs[i]->getPosition()[1], (GLfloat) objs[i]->getPosition()[2]);
+    // Rotation
+    // Rotate X
+    glRotatef((GLfloat) objs[i]->getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+    // Rotate Y
+    glRotatef((GLfloat) objs[i]->getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+    // Rotate Z
+    glRotatef((GLfloat) objs[i]->getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+    // Scale 
+    glScalef((GLfloat) objs[i]->getScale()[0], (GLfloat) objs[i]->getScale()[1],
+        (GLfloat) objs[i]->getScale()[2]);
+    // Color
+    glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
+
+
+    // TODO old light stuff
+    static GLfloat lightPosition[] = { 0.5f, 1.0f, 1.5f, 0.0f };
+    static GLfloat whiteLight[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    static GLfloat darkLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    glEnable(GL_LIGHTING);
+    //find glLight_0 and then set the rest as the offset from that since glLight0 is not 0 TODO
+
+    glEnable(GL_LIGHT0 + lights[i]->getLight()); //GL_LIGHT0
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_POSITION, lights[i]->getPosition());
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_AMBIENT, lights[i]->getAmbient());
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_DIFFUSE, lights[i]->getDiffuse());
+
+    glPopMatrix();
+  }
 
 
   glPointSize(5);
@@ -378,8 +403,7 @@ draw() {
     glScalef((GLfloat) objs[i]->getScale()[0], (GLfloat) objs[i]->getScale()[1],
         (GLfloat) objs[i]->getScale()[2]);
     // Color
-    // TODO comment out when textures are implemented TODO
-    glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
+    //glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
 
     // Get Data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]); // Bind EBO
