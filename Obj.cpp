@@ -15,7 +15,7 @@ Obj(string input) {
   loadOBJ(filename);
   constructData();
   initTransforms();
-  constructBuffers();
+  //constructBuffers();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

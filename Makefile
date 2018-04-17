@@ -23,7 +23,7 @@ endif
 ################################################################################
 # Open gl
 ifeq "$(OS)" "LINUX"
-  GL_LIBS = -lglut -lGLU -lGL -lGLEW -lQt5Gui -lQt5Core
+  GL_LIBS = -lglut -lGLU -lGL -lGLEW -lQt5Gui -lQt5Core -lSOIL
 else
   ifeq "$(OS)" "OSX"
   GL_LIBS = -framework GLUT -framework OpenGL
@@ -33,7 +33,7 @@ endif
 ################################################################################
 ## Rules
 ################################################################################
-INCL = $(GL_INCL) -I /usr/include/x86_64-linux-gnu/qt5 
+INCL = $(GL_INCL) -I /usr/include/x86_64-linux-gnu/qt5
 LIBS = $(GL_LIBS)
 
 OBJS = WindowClass.o\

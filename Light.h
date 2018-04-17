@@ -44,6 +44,7 @@ class Light {
     ///Getters
     int getType() {return position[3];}               // returns 0 for directional or 1 for spot
     float* getPosition() {return &position[0];}       // returns position vector
+    float getPosition(int i) {return position[i];}       // returns position vector
     float* getDirection(){return &direction[0];}      // returns direction vector
     float* getAmbient()  {return &ambient[0];}        // returns ambient vector
     float* getDiffuse()  {return &diffuse[0];}        // returns diffuse vector

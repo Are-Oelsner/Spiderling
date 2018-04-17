@@ -30,6 +30,9 @@
 #include <sstream>
 #include <memory>
 
+// SOIL
+#include "SOIL.h"
+
 // GL
 #if   defined(OSX) 
 #pragma clang diagnostic push
@@ -43,6 +46,7 @@
 #endif
 
 // GLM - included in Obj
+// Qt  - included in Obj
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Spiderling Objects
@@ -283,7 +287,6 @@ draw() {
   // Clear
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glPointSize(5);
 
   //////////////////////////////////////////////////////////////////////////////
   // Draw
@@ -291,10 +294,61 @@ draw() {
   // Camera
   cam.draw();
 
+  glPointSize(50);
+  glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
   // Lights
+  //glBegin(GL_POINTS);
   for(int i = 0; i < lights.size(); i++) {
-    lights[i]->draw();
+    //lights[i]->draw();
+    glPushMatrix();
+    // Translation
+    glTranslatef((GLfloat) lights[i]->getTranslation()[0], (GLfloat)
+        lights[i]->getTranslation()[1], (GLfloat) lights[i]->getTranslation()[2]);
+    // Rotation
+    // Rotate X
+    glRotatef((GLfloat) lights[i]->getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+    // Rotate Y
+    glRotatef((GLfloat) lights[i]->getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+    // Rotate Z
+    glRotatef((GLfloat) lights[i]->getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+    // Scale 
+    glScalef((GLfloat) lights[i]->getScale()[0], (GLfloat) lights[i]->getScale()[1],
+        (GLfloat) lights[i]->getScale()[2]);
+
+    // TODO old light stuff
+    //static GLfloat lightPosition[] = { 0.5f, 1.0f, 1.5f, 0.0f };
+    //static GLfloat whiteLight[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    //static GLfloat darkLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    glEnable(GL_LIGHTING);
+    //find glLight_0 and then set the rest as the offset from that since glLight0 is not 0 TODO
+
+    glEnable(GL_LIGHT0 + lights[i]->getLight()); // Enables light i
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_POSITION, lights[i]->getPosition());
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_AMBIENT, lights[i]->getAmbient());
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_DIFFUSE, lights[i]->getDiffuse());
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_SPECULAR, lights[i]->getSpecular());
+
+    if(lights[i]->getType() == 1) { // Spotlight/Pointlight exclusive
+      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_DIRECTION, lights[i]->getDirection());
+      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_CUTOFF, lights[i]->getAngularLimit());
+      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_EXPONENT, lights[i]->getAAtten());
+      if(*lights[i]->getAngularLimit() == 180.f) { // Pointlight exclusive
+        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_CONSTANT_ATTENUATION, lights[i]->getCAtten());
+        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_LINEAR_ATTENUATION, lights[i]->getLAtten());
+        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_QUADRATIC_ATTENUATION, lights[i]->getQAtten());
+      }
+    }
+
+    //glDisable(GL_LIGHT0 + lights[i]->getLight()); // Disables light i
+    if(lights[i]->getPosition(3) > 0.1) {
+      glColor3f(9.f, 8.f, 7.f);
+      glVertex3f((GLfloat) lights[i]->getPosition(0), (GLfloat) lights[i]->getPosition(1), (GLfloat) lights[i]->getPosition(2));
+    }
+    glPopMatrix();
   }
+  glEnd();
+  
+  glPointSize(5);
 
   // Objects
   for(int i = 0; i < objs.size(); i++) {
@@ -313,14 +367,28 @@ draw() {
     // Scale 
     glScalef((GLfloat) objs[i]->getScale()[0], (GLfloat) objs[i]->getScale()[1],
         (GLfloat) objs[i]->getScale()[2]);
-    // Color
-    //glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
 
     glEnable(GL_TEXTURE_2D);
 
+    glActiveTexture(GL_TEXTURE0);// + (unsigned int)i);
     // Get Data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]); // Bind EBO
     glBindBuffer(GL_ARRAY_BUFFER, vbos[i]); // Bind VBO
+    if(objs[i]->getBuffer() == -1) {
+      // Color
+      glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
+    }
+    else {
+      // Texture
+      glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
+      glBindTexture(GL_TEXTURE_2D, objs[i]->getBuffer()); // Bind texture
+      // TODO do I want these here or in construct buffers? TODO
+    //glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
+    //glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
+    //glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
+    //glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
+    //glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
+    }
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, sizeof(VEC8), (GLvoid*)NULL);
@@ -330,10 +398,6 @@ draw() {
 
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
-
-
-
-
 
     // Draw
     if(objs[i]->getMode() == 4) // Quads
@@ -458,26 +522,37 @@ constructBuffers() {
       /// Textures -- QOpenGLTexture object initialization
       ////////////////////////////////////////////////////////////////////////////
       
-      GLuint text = *objs[i]->getBuffer();
-      glGenTextures(1, &text);
-      glBindTexture(GL_TEXTURE_2D, text);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      //target, level, internalFormat, width, height, border, format, type, *data
-      //GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
-      //TODO TODO start here
-      //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, objs[i]->getMTL().texture->width(), objs[i]->getMTL().texture->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, objs[i]->getMTL().texture);//TODO check
+      const char * c = (const char*)&objs[i]->getMTL().map_Kd;
+      GLuint tex_2d = SOIL_load_OGL_texture(c, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+      if(0 == tex_2d) {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+        objs[i]->setBuffer(-1);
+      }
+      else{
+        objs[i]->setBuffer(tex_2d);
+        printf("tex_2d = %u\t i = %u\n", tex_2d, i);
 
-    const char * c = (const char*)&objs[i]->getMTL().map_Kd;
-    objs[i]->getMTL().texture = new QOpenGLTexture(QImage(QString(c)).mirrored());
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
-    glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
-    glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
-    glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
+        glActiveTexture(GL_TEXTURE0 + (unsigned int)i);
+        //GLuint text = *objs[i]->getBuffer();
+        //glGenTextures(1, &text);
+        //glBindTexture(GL_TEXTURE_2D, text);
+        glBindTexture(GL_TEXTURE_2D, tex_2d);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        //target, level, internalFormat, width, height, border, format, type, *data
+        //GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
+        //TODO TODO start here
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, objs[i]->getMTL().texture->width(), objs[i]->getMTL().texture->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, objs[i]->getMTL().texture);//TODO check
+
+        glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
+        glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
+        glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
+        glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
+        glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
+      }
     }
 }
 

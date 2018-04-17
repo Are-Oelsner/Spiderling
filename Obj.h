@@ -1,10 +1,6 @@
 #ifndef __OBJ_H__
 #define __OBJ_H__
 
-// Qt
-#include <QtGui/QImageReader>
-#include <QtCore/QTextStream>
-
 // GL
 #if   defined(OSX) 
 #pragma clang diagnostic push
@@ -17,8 +13,6 @@
 #include <GL/glx.h>
 #include <GL/glext.h>
 #endif
-
-#include <QtGui/QOpenGLTexture>
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -44,8 +38,8 @@ struct MTL { // Struct to store values from mtl file
   float Ns; // shininess of the material
   unsigned int illum; // represents illumination model 1:flat 2:specular highlights
   string map_Kd; // file containing texture map ex. .jpg
-  QOpenGLTexture *texture;
   GLuint buffer; // refers to glImage of texture GLuint
+  unsigned int textureNum;
 };
 
 
@@ -109,7 +103,8 @@ class Obj {
     float* getKa()  {return &material.Ka[0];}        // returns ambient vector
     float* getKd()  {return &material.Kd[0];}        // returns diffuse vector
     float* getKs()  {return &material.Ks[0];}       // returns specular vector
-    GLuint* getBuffer() {return &material.buffer;}  // returns texture buffer number 
+    GLuint getBuffer() {return material.buffer;}  // returns texture buffer number 
+    void setBuffer(GLuint buff) {material.buffer = buff;}  // returns texture buffer number 
 
 
     glm::vec4 getPosition() {return position;}
