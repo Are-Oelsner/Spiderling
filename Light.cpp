@@ -1,50 +1,85 @@
+#include "Light.h"
+
+// GL
+#if   defined(OSX) 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#include <GLUT/glut.h>
+#elif defined(LINUX)
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+#endif
+
+#include <string.h>
+#include <iostream>
+
 // Default Constructor
 Light::
 Light() {
-  position = new glm::vec4(0.f, 0.f, 100.f, 0.f); // Directional default behind camera
+  position = glm::vec4(0.f, 0.f, 100.f, 0.f); // Directional default behind camera
 }
 
 Light::
-Light(char* input) {
-  parseInput(input);
-}
-
-// Point Light Constructor
-Light::
-Light(glm::vec4 pos, glm::vec3 dir, glm::vec4 amb, glm::vec4 diff, glm::vec4
-    spec, float cAtten, float lAtten, float qAtten, float aAtten, float aLim) {
-  position = pos;
-  direction = dir;
-  ambient = amb;
-  diffuse = diff;
-  specular = spec;
-  constantAttenuation = cAtten;
-  linearAttenuation = lAtten;
-  quadraticAttenuation = qAtten;
-  angularAttenuation = aAtten;
-  angularLimit = aLim;
-}
-
-// Directional Light Constructor
-Light::
-Light(glm::vec4 pos, glm::vec3 dir, glm::vec4 amb, glm::vec4 diff, glm::vec4 spec) {
-  position = pos;
-  direction = dir;
-  ambient = amb;
-  diffuse = diff;
-  specular = spec;
+Light(string input, unsigned int lightNumber) {
+  char* data = (char*)input.c_str();
+  parseInput(data);
+  lightNum = lightNumber;
 }
 
 void
 Light::
 draw() {
-  glBegin(GL_POINTS);
-  for(int j = 0; j < numParticles; j++) {
-    glColor3f((GLfloat)data.at(j).color[0], (GLfloat)data.at(j).color[1], (GLfloat)data.at(j).color[2]); 
-    glVertex3f((GLfloat)data.at(j).position[0], (GLfloat)data.at(j).position[1], (GLfloat)data.at(j).position[2]);
+  glPushMatrix();
+  // Translation
+  glTranslatef((GLfloat) getTranslation()[0], (GLfloat)
+      getTranslation()[1], (GLfloat) getTranslation()[2]);
+  // Rotation
+  // Rotate X
+  glRotatef((GLfloat) getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+  // Rotate Y
+  glRotatef((GLfloat) getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+  // Rotate Z
+  glRotatef((GLfloat) getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+  // Scale 
+  glScalef((GLfloat) getScale()[0], (GLfloat) getScale()[1],
+      (GLfloat) getScale()[2]);
+
+  // TODO old light stuff
+  //static GLfloat lightPosition[] = { 0.5f, 1.0f, 1.5f, 0.0f };
+  //static GLfloat whiteLight[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+  //static GLfloat darkLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+  glEnable(GL_LIGHTING);
+  //find glLight_0 and then set the rest as the offset from that since glLight0 is not 0 TODO
+
+  glEnable(GL_LIGHT0 + getLight()); // Enables light i
+  glLightfv(GL_LIGHT0 + getLight(), GL_POSITION, getPosition());
+  glLightfv(GL_LIGHT0 + getLight(), GL_AMBIENT, getAmbient());
+  glLightfv(GL_LIGHT0 + getLight(), GL_DIFFUSE, getDiffuse());
+  glLightfv(GL_LIGHT0 + getLight(), GL_SPECULAR, getSpecular());
+
+  if(getType() == 1) { // Spotlight/Pointlight exclusive
+    glLightfv(GL_LIGHT0+getLight(), GL_SPOT_DIRECTION, getDirection());
+    glLightfv(GL_LIGHT0+getLight(), GL_SPOT_CUTOFF, getAngularLimit());
+    glLightfv(GL_LIGHT0+getLight(), GL_SPOT_EXPONENT, getAAtten());
+    if(*getAngularLimit() == 180.f) { // Pointlight exclusive
+      glLightfv(GL_LIGHT0+getLight(), GL_CONSTANT_ATTENUATION, getCAtten());
+      glLightfv(GL_LIGHT0+getLight(), GL_LINEAR_ATTENUATION, getLAtten());
+      glLightfv(GL_LIGHT0+getLight(), GL_QUADRATIC_ATTENUATION, getQAtten());
+    }
   }
-  glEnd();
+
+  //glDisable(GL_LIGHT0 + getLight()); // Disables light i
+  glPopMatrix();
 }
+
+void 
+Light::
+print() {
+  printf("light#: %u\t type: %f\tposition: (%f, %f, %f)\tdirection: (%f, %f, %f)\n", lightNum, position[3], position[0], position[1], position[2], direction[0], direction[1], direction[2]);
+}
+
 
 char*
 Light::
@@ -96,7 +131,7 @@ parseInput(char* input) {
     t = atof(tmp);
   specular = glm::vec4(x, y, z, t); // Sets Ambient
   if((tmp = strtok(NULL, " ")) != NULL) // The following only happen for spot/point lights
-   constantAttenuation = atof(tmp); // Sets constant Attenuation
+    constantAttenuation = atof(tmp); // Sets constant Attenuation
   if((tmp = strtok(NULL, " ")) != NULL)
     linearAttenuation = atof(tmp);  // Sets linear attenuation
   if((tmp = strtok(NULL, " ")) != NULL)

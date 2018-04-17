@@ -1,7 +1,25 @@
 #ifndef __OBJ_H__
 #define __OBJ_H__
 
+// Qt
 #include <QtGui/QImageReader>
+#include <QtCore/QTextStream>
+
+// GL
+#if   defined(OSX) 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#include <GLUT/glut.h>
+#elif defined(LINUX)
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+#include <GL/glext.h>
+#endif
+
+#include <QtGui/QOpenGLTexture>
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vector>
@@ -25,8 +43,9 @@ struct MTL { // Struct to store values from mtl file
   float d; // transparency of the material/ also represented as Tr
   float Ns; // shininess of the material
   unsigned int illum; // represents illumination model 1:flat 2:specular highlights
-  char* map_Kd; // file containing texture map ex. .jpg
-  unsigned int texture; // refers to glImage of texture GLuint
+  string map_Kd; // file containing texture map ex. .jpg
+  QOpenGLTexture *texture;
+  GLuint buffer; // refers to glImage of texture GLuint
 };
 
 
@@ -35,6 +54,7 @@ class Obj {
     ////////////////////////////////////////////////////////////////////////////////
     ///Private Variables
     int mode = 3;   // 3 GL_TRIANGLES, 4 GL_QUADS
+    GLuint ebo, vbo;
 
     // Final Data
     // Vertex-Normal Pairs
@@ -78,21 +98,19 @@ class Obj {
 
 
     ///Functions
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// @brief Loads obj file
-    /// @param path file path to read from 
-    /// v : vertex, vt : texture coordinate (TODO), vn : vertex normal, f : face. 
-    ///
-    /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
-    void loadOBJ(const char *filename);
-    void loadMTL(const char *filename);
-
+    void draw();
     void print(bool debug);
 
     //Getters
     const vector<VEC8>& getData();
     const vector<unsigned int>& getIndices();
+    MTL& getMTL() {return material;}
+
+    float* getKa()  {return &material.Ka[0];}        // returns ambient vector
+    float* getKd()  {return &material.Kd[0];}        // returns diffuse vector
+    float* getKs()  {return &material.Ks[0];}       // returns specular vector
+    GLuint* getBuffer() {return &material.buffer;}  // returns texture buffer number 
+
 
     glm::vec4 getPosition() {return position;}
     void setPosition(glm::vec4 vec) {position = vec;}
@@ -126,6 +144,13 @@ class Obj {
   protected:
     ////////////////////////////////////////////////////////////////////////////////
     /// Helper Functions
+    ////////////////////////////////////////////////////////////////////////////////
+    /// @brief Loads obj file
+    /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
+    void loadOBJ(const char *filename);
+    void loadMTL(const char *filename);
+    void constructBuffers();
+
     const vector<glm::vec3> getVertices();
     const vector<unsigned int> getVertexIndices();
     const vector<glm::vec2> getUvs();

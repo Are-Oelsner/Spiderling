@@ -18,20 +18,17 @@
 #include "WindowClass.h"
 #include "Camera.h"
 #include "ParticleSystem.h"
+#include "Light.h"
 
 // STL
 #include <cmath>
 #include <chrono>
-//#include <iostream>
 #include <fstream>
-
 #include <string>
 #include <string.h>
 #include <vector>
 #include <sstream>
 #include <memory>
-
-
 
 // GL
 #if   defined(OSX) 
@@ -62,11 +59,14 @@ Camera cam;
 ////////////////////////////////////////////////////////////////////////////////
 // Object from .obj file specified by argv[1] in main
 vector<unique_ptr<Obj>> objs;
-
+vector<GLuint> ebos, vbos;
+// Particle Systems
 vector<unique_ptr<ParticleSystem>> ps;
+// Repulsors
 vector<struct Repulsor> repulsors;
 int rep = 0;
-
+// Lights
+vector<unique_ptr<Light>> lights;
 
 // Frame rate
 const unsigned int FPS = 60;
@@ -75,13 +75,6 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   std::chrono::high_resolution_clock::now()};
 float g_delay{0.f};
 float g_framesPerSecond{0.f};
-
-// Vertex Array Object, Vertex Buffer Object (vertices, normals, vertex indices, normal indices)
-vector<GLuint> vbos;
-vector<GLuint> ebos;
-
-// Lights
-vector<unique_ptr<Light>> lights;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,7 +255,8 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   }
 }
 
-Repulsor makeRepulsor(string filename) {
+Repulsor 
+makeRepulsor(string filename) {
   struct Repulsor repulsor;
   char* input = (char*) filename.c_str();
   char* tmp = strtok(input, " ");
@@ -280,53 +274,6 @@ Repulsor makeRepulsor(string filename) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief constructBuffers
-void
-constructBuffers() {
-  for(int i = 0; i < objs.size(); i++) {
-    ////////////////////////////////////////////////////////////////////////////
-    /// Element Buffer Object
-    ////////////////////////////////////////////////////////////////////////////
-    GLuint ebo;
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i]->getIndices().size(), objs[i]->getIndices().data(), GL_STATIC_DRAW);
-    ebos.emplace_back(ebo);
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    /// Vertex Array Object
-    ////////////////////////////////////////////////////////////////////////////
-    //glGenVertexArrays(1, &vao); 
-    //glBindVertexArray(vao);     // Bind VAO
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    /// Vertex Buffer Object
-    ////////////////////////////////////////////////////////////////////////////
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VEC8)*objs[i]->getData().size(), objs[i]->getData().data(), GL_STATIC_DRAW);
-    vbos.emplace_back(vbo);
-
-
-
-    //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*objs[i]->getData()->size(), objs[i]->getData()->data());
-
-    /// For without VAO
-    //glEnableClientState(GL_VERTEX_ARRAY);
-    //glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-    //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i]->getVertices()), sizeof(*objs[i]->getNormals()) , objs[i]->getNormals());
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i]->getVertices()));
-    //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
-  }
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief Draw function for single frame
 void
 draw() {
@@ -336,63 +283,24 @@ draw() {
   // Clear
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glPointSize(5);
+
   //////////////////////////////////////////////////////////////////////////////
   // Draw
 
   // Camera
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  gluLookAt(cam.eye(0), cam.eye(1), cam.eye(2), cam.at(0), cam.at(1), cam.at(2), cam.getUp(0), cam.getUp(1), cam.getUp(2)); 
-  //gluLookAt(cam.eX()*std::sin(cam.theta(), cam.eY(), cam.eZ()*std::cos(cam.theta()),
-  //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
+  cam.draw();
 
   // Lights
   for(int i = 0; i < lights.size(); i++) {
-    glPushMatrix();
-    // Translation
-    glTranslatef((GLfloat) objs[i]->getPosition()[0], (GLfloat)
-        objs[i]->getPosition()[1], (GLfloat) objs[i]->getPosition()[2]);
-    // Rotation
-    // Rotate X
-    glRotatef((GLfloat) objs[i]->getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
-    // Rotate Y
-    glRotatef((GLfloat) objs[i]->getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
-    // Rotate Z
-    glRotatef((GLfloat) objs[i]->getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
-    // Scale 
-    glScalef((GLfloat) objs[i]->getScale()[0], (GLfloat) objs[i]->getScale()[1],
-        (GLfloat) objs[i]->getScale()[2]);
-    // Color
-    glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
-
-
-    // TODO old light stuff
-    static GLfloat lightPosition[] = { 0.5f, 1.0f, 1.5f, 0.0f };
-    static GLfloat whiteLight[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-    static GLfloat darkLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-    glEnable(GL_LIGHTING);
-    //find glLight_0 and then set the rest as the offset from that since glLight0 is not 0 TODO
-
-    glEnable(GL_LIGHT0 + lights[i]->getLight()); //GL_LIGHT0
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_POSITION, lights[i]->getPosition());
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_AMBIENT, lights[i]->getAmbient());
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_DIFFUSE, lights[i]->getDiffuse());
-
-    glPopMatrix();
+    lights[i]->draw();
   }
 
-
-  glPointSize(5);
-  glEnable(GL_POINT_SMOOTH);
-  glEnable(GL_TEXTURE_2D);
-
-
-
+  // Objects
   for(int i = 0; i < objs.size(); i++) {
-    //glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
+    //objs[i]->draw();
     glPushMatrix();
-    // Translation
+    //Translation
     glTranslatef((GLfloat) objs[i]->getPosition()[0], (GLfloat)
         objs[i]->getPosition()[1], (GLfloat) objs[i]->getPosition()[2]);
     // Rotation
@@ -408,6 +316,8 @@ draw() {
     // Color
     //glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
 
+    glEnable(GL_TEXTURE_2D);
+
     // Get Data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]); // Bind EBO
     glBindBuffer(GL_ARRAY_BUFFER, vbos[i]); // Bind VBO
@@ -422,59 +332,32 @@ draw() {
     glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
 
 
+
+
+
     // Draw
     if(objs[i]->getMode() == 4) // Quads
       glDrawElements(GL_QUADS, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
     else                        // Triangles
       glDrawElements(GL_TRIANGLES, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
+    //glDisable(GL_TEXTURE_2D);
     glPopMatrix();
   }
 
+  // Particle Systems
   for(int i = 0; i < ps.size(); i++) {
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-
-    // Translate
-    glTranslatef((GLfloat) ps[i]->getPosition()[0], (GLfloat) ps[i]->getPosition()[1], (GLfloat) ps[i]->getPosition()[2]);
-    // Rotation
-    // Rotate X
-    glRotatef((GLfloat) ps[i]->getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
-    // Rotate Y
-    glRotatef((GLfloat) ps[i]->getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
-    // Rotate Z
-    glRotatef((GLfloat) ps[i]->getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
-    // Scale
-    glScalef((GLfloat) ps[i]->getScale()[0], (GLfloat) ps[i]->getScale()[1], (GLfloat) ps[i]->getScale()[2]);
-    
-    //ps[i]->printData();
-
-    // draw 
     ps[i]->draw();
-    // update
     ps[i]->update(repulsors);
-
-    glPopMatrix();
   }
 
-  // Draw Repulsors/Attractors
+  // Repulsors/Attractors
   glPointSize(20);
-  glColor3f(.0f, .0f, .0f);
   glBegin(GL_POINTS);
   for(int i = 0; i < repulsors.size(); i++) {
-  glColor3f((GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state);
+    glColor3f((GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state);
     glVertex3f((GLfloat) repulsors.at(i).position[0], (GLfloat) repulsors.at(i).position[1], (GLfloat) repulsors.at(i).position[2]);
   }
   glEnd();
-
-//glColor3f(.376f, .502f, .220f);
-//glBegin(GL_QUADS);
-//glVertex3f(-40, -5, -40);
-//glVertex3f(-40, -5, 40);
-//glVertex3f(40, -5, 40);
-//glVertex3f(40, -5, -40);
-//glEnd();
-
-
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -489,37 +372,114 @@ draw() {
   //printf("FPS: %6.2f\n", g_framesPerSecond);
 }
 
-void parse(const char* file, const char* debug) {
+void parse(const char* file) {
   ifstream objFile;
   objFile.open(file);
   string filename;
-  string obj = ".obj";
-  size_t foundobj;
-  size_t foundpar;
-  size_t foundrep;
+  size_t foundobj; // found object
+  size_t foundpar; // found particle system
+  size_t foundrep; // found repulsor
+  size_t foundlgt; // found light
+  printf("################################################################################");
   while(getline(objFile, filename)) {
+    printf("\n");
     foundobj = filename.find(".obj");
     foundpar = filename.find(".par");
     foundrep = filename.find(".rep");
-    if(foundrep == string::npos && foundobj == string::npos && foundpar != string::npos) {
+    foundlgt = filename.find("light");
+    if(foundrep == string::npos && foundobj == string::npos && foundpar != string::npos && foundlgt == string::npos) {
       ps.emplace_back(new ParticleSystem(filename));
       printf("Particle System: %s\n", filename.c_str());
       ps.back()->print();
     }
-    else if(foundobj != string::npos && foundpar == string::npos && foundrep == string::npos)  {
+    else if(foundobj != string::npos && foundpar == string::npos && foundrep == string::npos && foundlgt == string::npos)  {
       objs.emplace_back(new Obj(filename));
       printf("Object: %s\n", filename.c_str());
-      objs.back()->print(atoi(debug));
+      objs.back()->print(false);
     }
-    else if(foundobj == string::npos && foundpar == string::npos && foundrep != string::npos)  {
+    else if(foundrep != string::npos && foundobj == string::npos && foundpar == string::npos && foundlgt == string::npos)  {
       repulsors.emplace_back(makeRepulsor(filename));
       printf("Repulsor: %s\n", filename.c_str());
       //repulsors.back()->print();
     }
+    else if(foundlgt != string::npos && foundobj == string::npos && foundpar == string::npos && foundrep == string::npos) {
+      lights.emplace_back(new Light(filename, lights.size()));
+      printf("Light: %s\n", filename.c_str());
+      lights.back()->print();
+    }
   }
+  printf("################################################################################\n");
   objFile.close();
 }
 
+void
+constructBuffers() {
+    for(int i = 0; i < objs.size(); i++) {
+      ////////////////////////////////////////////////////////////////////////////
+      /// Element Buffer Object
+      ////////////////////////////////////////////////////////////////////////////
+      GLuint ebo;
+      glGenBuffers(1, &ebo);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i]->getIndices().size(), objs[i]->getIndices().data(), GL_STATIC_DRAW);
+      ebos.emplace_back(ebo);
+
+
+      ////////////////////////////////////////////////////////////////////////////
+      /// Vertex Array Object
+      ////////////////////////////////////////////////////////////////////////////
+      //glGenVertexArrays(1, &vao); 
+      //glBindVertexArray(vao);     // Bind VAO
+
+
+      ////////////////////////////////////////////////////////////////////////////
+      /// Vertex Buffer Object
+      ////////////////////////////////////////////////////////////////////////////
+      GLuint vbo;
+      glGenBuffers(1, &vbo);
+      glBindBuffer(GL_ARRAY_BUFFER, vbo);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(VEC8)*objs[i]->getData().size(), objs[i]->getData().data(), GL_STATIC_DRAW);
+      vbos.emplace_back(vbo);
+
+
+
+      //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*objs[i]->getData()->size(), objs[i]->getData()->data());
+
+      /// For without VAO
+      //glEnableClientState(GL_VERTEX_ARRAY);
+      //glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+      //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i]->getVertices()), sizeof(*objs[i]->getNormals()) , objs[i]->getNormals());
+      //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i]->getVertices()));
+      //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+      
+
+      ////////////////////////////////////////////////////////////////////////////
+      /// Textures -- QOpenGLTexture object initialization
+      ////////////////////////////////////////////////////////////////////////////
+      
+      GLuint text = *objs[i]->getBuffer();
+      glGenTextures(1, &text);
+      glBindTexture(GL_TEXTURE_2D, text);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      //target, level, internalFormat, width, height, border, format, type, *data
+      //GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
+      //TODO TODO start here
+      //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, objs[i]->getMTL().texture->width(), objs[i]->getMTL().texture->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, objs[i]->getMTL().texture);//TODO check
+
+    const char * c = (const char*)&objs[i]->getMTL().map_Kd;
+    objs[i]->getMTL().texture = new QOpenGLTexture(QImage(QString(c)).mirrored());
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
+    glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
+    glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main
@@ -542,8 +502,8 @@ main(int _argc, char** _argv) {
   m_window.window(glutCreateWindow("Spiderling: A Rudimentary Game Engine"));
 
   // Input Error
-  if(_argc != 3) { 
-    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <filename.dat> <0/1 debug>" << std::endl; 
+  if(_argc != 2) { 
+    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <filename.dat>" << std::endl; 
   }
 
   // GL
@@ -560,12 +520,9 @@ main(int _argc, char** _argv) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Parses File and Constructs Objs
-  parse(_argv[1], _argv[2]);
+  parse(_argv[1]);
 
-  //////////////////////////////////////////////////////////////////////////////
-  // Construct Buffer Objects 
-  if(objs.size() > 0)
-    constructBuffers();
+  constructBuffers();
 
   //////////////////////////////////////////////////////////////////////////////
   // Start application

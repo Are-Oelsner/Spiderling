@@ -37,6 +37,7 @@ class Camera {
     Camera();
     
     ///Functions
+    void draw();
     void reset();
 
     glm::vec4 translate(float tx, float ty, float tz);

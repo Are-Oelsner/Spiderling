@@ -1,5 +1,17 @@
 #include "Camera.h"
 
+// GL
+#if   defined(OSX) 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#include <GLUT/glut.h>
+#elif defined(LINUX)
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+#endif
+
 Camera::
 Camera() {
   g_theta = 0.f;
@@ -32,6 +44,16 @@ translate(float tx, float ty, float tz) {
   //m_at = m_translation * m_at;
   m_at = m_translation * m_at;
   return m_eye = m_translation * m_eye;
+}
+
+void
+Camera::
+draw() {
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  gluLookAt(eye(0), eye(1), eye(2), at(0), at(1), at(2), getUp(0), getUp(1), getUp(2)); 
+  //gluLookAt(cam.eX()*std::sin(cam.theta(), cam.eY(), cam.eZ()*std::cos(cam.theta()),
+  //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 }
 
 

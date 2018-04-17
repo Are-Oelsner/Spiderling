@@ -1,18 +1,6 @@
 #ifndef __PARTICLESYSTEM_H__
 #define __PARTICLESYSTEM_H__
 
-// GL
-#if   defined(OSX) 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#include <GLUT/glut.h>
-#elif defined(LINUX)
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
-#endif
-
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/glm.hpp>
@@ -21,7 +9,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <string.h>
 #include <random>
 #include <math.h>
 

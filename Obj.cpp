@@ -1,4 +1,5 @@
 #include "Obj.h"
+
 #include <sstream>
 #include <string.h>
 #include <stdexcept>
@@ -14,10 +15,77 @@ Obj(string input) {
   loadOBJ(filename);
   constructData();
   initTransforms();
+  constructBuffers();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ///Functions
+void
+Obj::
+draw() {
+  glPushMatrix();
+  // Translation
+  glTranslatef((GLfloat) getPosition()[0], (GLfloat)
+      getPosition()[1], (GLfloat) getPosition()[2]);
+  // Rotation
+  // Rotate X
+  glRotatef((GLfloat) getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+  // Rotate Y
+  glRotatef((GLfloat) getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+  // Rotate Z
+  glRotatef((GLfloat) getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+  // Scale 
+  glScalef((GLfloat) getScale()[0], (GLfloat) getScale()[1],
+      (GLfloat) getScale()[2]);
+
+  // Get Data
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); // Bind EBO
+  glBindBuffer(GL_ARRAY_BUFFER, vbo); // Bind VBO
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(3, GL_FLOAT, sizeof(VEC8), (GLvoid*)NULL);
+
+  glEnableClientState(GL_NORMAL_ARRAY);
+  glNormalPointer(GL_FLOAT, sizeof(VEC8), (GLvoid*)(sizeof(glm::vec3)));
+
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
+
+  glColor4f((GLfloat) getColor()[0], (GLfloat) getColor()[1], (GLfloat) getColor()[2], (GLfloat) getColor()[3]);
+//// Textures
+//if(material.map_Kd != "") {
+//  const char * c = (const char*)&material.map_Kd;
+//  printf("before QOpenGLTexture creation\n");
+//  material.texture = new QOpenGLTexture(QImage(QString(c)).mirrored());
+//  //material.texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+//  //material.texture->setMagnificationFilter(QOpenGLTexture::Linear);
+//  printf("at end\n");
+//}
+
+//glEnable(GL_TEXTURE_2D);
+////material.texture->bind();
+////target, level, internalFormat, width, height, border, format, type, *data
+////GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
+//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, material.texture->width(), material.texture->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, material.texture);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+//glMaterialfv(GL_FRONT, GL_AMBIENT,  getKa());
+//glMaterialfv(GL_FRONT, GL_DIFFUSE,  getKd());
+//glMaterialfv(GL_FRONT, GL_SPECULAR, getKs());
+//glMaterialfv(GL_FRONT, GL_EMISSION, getKs());
+//glMaterialfv(GL_FRONT, GL_SHININESS, getKs());
+
+  // Draw
+  if(getMode() == 4) // Quads
+    glDrawElements(GL_QUADS, getIndices().size(), GL_UNSIGNED_INT, 0);
+  else                        // Triangles
+    glDrawElements(GL_TRIANGLES, getIndices().size(), GL_UNSIGNED_INT, 0);
+  //glDisable(GL_TEXTURE_2D);
+  glPopMatrix();
+}
+
+
 const vector<VEC8>&
 Obj::getData() {
   return data;
@@ -65,6 +133,47 @@ setMode(int m) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief constructBuffers
+void
+Obj::
+constructBuffers() {
+  ////////////////////////////////////////////////////////////////////////////
+  /// Element Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  glGenBuffers(1, &ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*getIndices().size(), getIndices().data(), GL_STATIC_DRAW);
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Array Object
+  ////////////////////////////////////////////////////////////////////////////
+  //glGenVertexArrays(1, &vao); 
+  //glBindVertexArray(vao);     // Bind VAO
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Vertex Buffer Object
+  ////////////////////////////////////////////////////////////////////////////
+  GLuint vbo;
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(VEC8)*getData().size(), getData().data(), GL_STATIC_DRAW);
+
+
+  //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*objs[i]->getData()->size(), objs[i]->getData()->data());
+
+  /// For without VAO
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+  //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i]->getVertices()), sizeof(*objs[i]->getNormals()) , objs[i]->getNormals());
+  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i]->getVertices()));
+  //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief Loads obj file
 /// @param path file path to read from 
 /// v : vertex, vt : texture coordinate (TODO), vn : vertex normal, f : face. 
@@ -95,7 +204,6 @@ loadOBJ(const char *filename) {
       char mtl[100];
       tmp = fscanf(file, "%s\n", mtl);
       loadMTL(mtl);
-      printf("%s\n", mtl);
     }
     // Vertices
     if(strcmp(lineHeader, "v") == 0) {
@@ -192,6 +300,7 @@ loadMTL(const char* filename) {
     // Ka 
     else if(strcmp(lineHeader, "Ka") == 0) {
       tmp=fscanf(file, "%f %f %f\n", &material.Ka.x, &material.Ka.y, &material.Ka.z);
+      
     }
     // Kd
     else if(strcmp(lineHeader, "Kd") == 0) {
@@ -216,7 +325,6 @@ loadMTL(const char* filename) {
     // map_Kd
     else if(strcmp(lineHeader, "map_Kd") == 0) {
       tmp = fscanf(file, "%s\n", material.map_Kd);
-      printf("%s\n", material.map_Kd);
     }
   }
   fclose(file);
@@ -263,7 +371,9 @@ parseInput(char* input) {
 void
 Obj::
 print(bool debug) {
-  printf("mode: %u\t#vertices: %lu\t#uvs: %lu\t#normals: %lu\n#faces: %lu\t#vertIndices: %lu\ndata: %lu\tindices:%lu\n\n", mode, vertices.size(), uvs.size(), normals.size(), vertices.size()/mode, vertexIndices.size(), data.size(), indices.size());
+  printf("mode: %u\t#vertices: %lu\t#uvs: %lu\t#normals: %lu\n#faces: %lu\t#vertIndices: %lu\ndata: %lu\tindices:%lu\n", mode, vertices.size(), uvs.size(), normals.size(), vertices.size()/mode, vertexIndices.size(), data.size(), indices.size());
+  printf("Material-- Ka: (%f, %f, %f)\tKd: (%f, %f, %f)\tKs: (%f, %f, %f)\n", material.Ka.x, material.Ka.y, material.Ka.z, material.Kd.x, material.Kd.y, material.Kd.z, material.Ks.x, material.Ks.y, material.Ks.z);
+  printf("map_Kd: %s\td: %f\tNs: %f\tillum: %u\n", material.map_Kd, material.d, material.Ns, material.illum);
   if(debug) {
     for(int i = 0; i < (int)indices.size(); i++) {
       printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);

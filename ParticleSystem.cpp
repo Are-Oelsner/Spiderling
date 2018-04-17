@@ -1,5 +1,19 @@
 #include "ParticleSystem.h"
 
+// GL
+#if   defined(OSX) 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#include <GLUT/glut.h>
+#elif defined(LINUX)
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+#endif
+
+#include <string.h>
+
 ParticleSystem::
 ParticleSystem() {
 }
@@ -147,12 +161,28 @@ update(const vector<Repulsor> repulsors) {
 void
 ParticleSystem::
 draw() {
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+
+  // Translate
+  glTranslatef((GLfloat) getPosition()[0], (GLfloat) getPosition()[1], (GLfloat) getPosition()[2]);
+  // Rotation
+  // Rotate X
+  glRotatef((GLfloat) getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
+  // Rotate Y
+  glRotatef((GLfloat) getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
+  // Rotate Z
+  glRotatef((GLfloat) getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
+  // Scale
+  glScalef((GLfloat) getScale()[0], (GLfloat) getScale()[1], (GLfloat) getScale()[2]);
+  //printData();
   glBegin(GL_POINTS);
   for(int j = 0; j < numParticles; j++) {
-    glColor3f((GLfloat)data.at(j).color[0], (GLfloat)data.at(j).color[1], (GLfloat)data.at(j).color[2]); 
+    glColor3f((GLfloat)data.at(j).color[0], (GLfloat)data.at(j).color[1], (GLfloat)data.at(j).color[2]);
     glVertex3f((GLfloat)data.at(j).position[0], (GLfloat)data.at(j).position[1], (GLfloat)data.at(j).position[2]);
   }
   glEnd();
+  glPopMatrix();
 }
 
 void 
