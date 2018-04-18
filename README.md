@@ -182,3 +182,5 @@ Continue work on Obj.cpp line 197
 working on light.h line 28. Need to finish light constructors, light input parsing, adding light to 'obj' constructor in main, adding vector of shared pointer of lights to main, and then drawing lights appropriately based on type. Then need to finish mtl file stuff.
 
 Add in command line parser from networks project 1 for light data parser so I can specify with -char
+
+TODO fix loading from objs subdirectory. Can FILE fopen access subdirectories?

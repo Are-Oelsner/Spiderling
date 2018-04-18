@@ -39,7 +39,6 @@ struct MTL { // Struct to store values from mtl file
   unsigned int illum; // represents illumination model 1:flat 2:specular highlights
   string map_Kd; // file containing texture map ex. .jpg
   GLuint buffer; // refers to glImage of texture GLuint
-  unsigned int textureNum;
 };
 
 

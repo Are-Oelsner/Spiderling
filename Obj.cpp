@@ -211,7 +211,7 @@ loadOBJ(const char *filename) {
       tmp=fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z); // reads in vertex coordinates
       vertices.push_back(vertex);
     }
-    // Vertex Textures -- Don't need for now TODO
+    // Vertex Textures
     else if(strcmp(lineHeader, "vt") == 0) {
       glm::vec2 uv;
       tmp = fscanf(file, "%f %f\n", &uv.x, &uv.y);
