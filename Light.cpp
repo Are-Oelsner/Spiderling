@@ -103,7 +103,10 @@ parseInput(char* input) {
     y = atof(tmp);
   if((tmp = strtok(NULL, " ")) != NULL)
     z = atof(tmp);
-  direction = glm::normalize(glm::vec3(x, y, z)); // Sets direction
+  if(t > 0) // spot/point
+    direction = glm::vec3(x, y, z); // Sets direction
+  else if(t <= 0)
+    direction = glm::normalize(glm::vec3(x, y, z)); // Sets direction
   if((tmp = strtok(NULL, " ")) != NULL)
     x = atof(tmp);
   if((tmp = strtok(NULL, " ")) != NULL)

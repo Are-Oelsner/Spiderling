@@ -87,7 +87,7 @@ class Obj {
   public:
     ///Constructors
     Obj() {}
-    Obj(string filename);
+    Obj(string filename, string dir);
 
 
     ///Functions
@@ -141,8 +141,8 @@ class Obj {
     ////////////////////////////////////////////////////////////////////////////////
     /// @brief Loads obj file
     /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
-    void loadOBJ(const char *filename);
-    void loadMTL(const char *filename);
+    void loadOBJ(const char *filename, const char* directory);
+    void loadMTL(const char *filename, const char* directory);
     void constructBuffers();
 
     const vector<glm::vec3> getVertices();

@@ -9,10 +9,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 ///Constructors 
 Obj::
-Obj(string input) {
-  char* tmp = (char*)input.c_str();
-  char* filename = parseInput(tmp);
-  loadOBJ(filename);
+Obj(string input, string dir) {
+  char* data = (char*)input.c_str();
+  char* directory = (char*)dir.c_str();
+  char* filename = parseInput(data);
+  loadOBJ(filename, directory);
   constructData();
   initTransforms();
   //constructBuffers();
@@ -181,7 +182,7 @@ constructBuffers() {
 /// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
 void
 Obj::
-loadOBJ(const char *filename) {
+loadOBJ(const char *filename, const char *directory) {
   // Temp storage for contents of obj file
   vector<unsigned int> vertexIndexList, uvIndexList, normalIndexList;
   std::vector<glm::vec3> tmp_vertices;
@@ -203,7 +204,10 @@ loadOBJ(const char *filename) {
     if(strcmp(lineHeader, "mtllib") == 0) {
       char mtl[100];
       tmp = fscanf(file, "%s\n", mtl);
-      loadMTL(mtl);
+      string MTL = mtl;
+      MTL.insert(0, 1, '/');
+      MTL.insert(0, directory);
+      loadMTL(MTL.c_str(), directory);
     }
     // Vertices
     if(strcmp(lineHeader, "v") == 0) {
@@ -284,7 +288,7 @@ loadOBJ(const char *filename) {
 
 void
 Obj::
-loadMTL(const char* filename) {
+loadMTL(const char* filename, const char* directory) {
   FILE *file = fopen(filename, "r");
   int tmp;
   if(file == NULL) {
@@ -324,7 +328,13 @@ loadMTL(const char* filename) {
     }
     // map_Kd
     else if(strcmp(lineHeader, "map_Kd") == 0) {
-      tmp = fscanf(file, "%s\n", material.map_Kd);
+      char map[100];
+      tmp = fscanf(file, "%s\n", map);
+      material.map_Kd.insert(0, map);
+      std::cout << "map_Kd:::  " << material.map_Kd << std::endl;
+      material.map_Kd.insert(0, 1, '/');
+      material.map_Kd.insert(0, directory);
+      std::cout << "map_Kd:::  " << material.map_Kd << std::endl;
     }
   }
   fclose(file);
@@ -334,7 +344,7 @@ loadMTL(const char* filename) {
 char*
 Obj::
 parseInput(char* input) {
-  char* filename = strtok(input, " ");
+  char* filename = strtok(input, " ");// gets obj filename
   char* tmp;
   float x, y, z;
   if((tmp = strtok(NULL, " ")) != NULL)
@@ -373,7 +383,7 @@ Obj::
 print(bool debug) {
   printf("mode: %u\t#vertices: %lu\t#uvs: %lu\t#normals: %lu\n#faces: %lu\t#vertIndices: %lu\ndata: %lu\tindices:%lu\n", mode, vertices.size(), uvs.size(), normals.size(), vertices.size()/mode, vertexIndices.size(), data.size(), indices.size());
   printf("Material-- Ka: (%f, %f, %f)\tKd: (%f, %f, %f)\tKs: (%f, %f, %f)\n", material.Ka.x, material.Ka.y, material.Ka.z, material.Kd.x, material.Kd.y, material.Kd.z, material.Ks.x, material.Ks.y, material.Ks.z);
-  printf("map_Kd: %s\td: %f\tNs: %f\tillum: %u\n", material.map_Kd, material.d, material.Ns, material.illum);
+  printf("map_Kd: %s\td: %f\tNs: %f\tillum: %u\n", material.map_Kd.c_str(), material.d, material.Ns, material.illum);
   if(debug) {
     for(int i = 0; i < (int)indices.size(); i++) {
       printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);

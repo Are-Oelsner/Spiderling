@@ -371,6 +371,11 @@ draw() {
       // Color
       glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
       glDisable(GL_TEXTURE_2D);
+      glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
+      glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
+      glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
+      glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
+      glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -389,6 +394,7 @@ draw() {
     glPopMatrix();
   }
 
+  glColor3f(0.3f, 0.f, 1.f);
   // Particle Systems
   for(int i = 0; i < ps.size(); i++) {
     ps[i]->draw();
@@ -417,10 +423,11 @@ draw() {
   //printf("FPS: %6.2f\n", g_framesPerSecond);
 }
 
-void parse(const char* file) {
+void parse(const char* file, const char* directory) {
   ifstream objFile;
   objFile.open(file);
   string filename;
+  string dir = directory;
   size_t foundobj; // found object
   size_t foundpar; // found particle system
   size_t foundrep; // found repulsor
@@ -433,12 +440,16 @@ void parse(const char* file) {
     foundrep = filename.find(".rep");
     foundlgt = filename.find("light");
     if(foundrep == string::npos && foundobj == string::npos && foundpar != string::npos && foundlgt == string::npos) {
+      filename.insert(0, 1, '/');
+      filename.insert(0, dir);
       ps.emplace_back(new ParticleSystem(filename));
       printf("Particle System: %s\n", filename.c_str());
       ps.back()->print();
     }
     else if(foundobj != string::npos && foundpar == string::npos && foundrep == string::npos && foundlgt == string::npos)  {
-      objs.emplace_back(new Obj(filename));
+      filename.insert(0, 1, '/');
+      filename.insert(0, dir);
+      objs.emplace_back(new Obj(filename, dir));
       printf("Object: %s\n", filename.c_str());
       objs.back()->print(false);
     }
@@ -503,7 +514,7 @@ constructBuffers() {
       /// Textures -- QOpenGLTexture object initialization
       ////////////////////////////////////////////////////////////////////////////
       
-      const char * c = (const char*)&objs[i]->getMTL().map_Kd;
+      const char * c = (const char*)objs[i]->getMTL().map_Kd.c_str();
       GLuint tex_2d = SOIL_load_OGL_texture(c, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
       if(tex_2d == 0) {
         printf("SOIL loading error: '%s'\n", SOIL_last_result());
@@ -511,7 +522,7 @@ constructBuffers() {
       }
       else{
         objs[i]->setBuffer(tex_2d);
-        printf("tex_2d = %u\t i = %u\n", tex_2d, i);
+        printf("texture id = %u\t i = %u\n", tex_2d, i);
 
 
         //glActiveTexture(GL_TEXTURE0 + (unsigned int)i);
@@ -553,8 +564,8 @@ main(int _argc, char** _argv) {
   m_window.window(glutCreateWindow("Spiderling: A Rudimentary Game Engine"));
 
   // Input Error
-  if(_argc != 2) { 
-    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <filename.dat>" << std::endl; 
+  if(_argc != 3) { 
+    std::cout << "Error: incorrect number of arguments, usage is\n ./spiderling <filename.dat> <file directory>" << std::endl; 
   }
 
   // GL
@@ -571,7 +582,7 @@ main(int _argc, char** _argv) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Parses File and Constructs Objs
-  parse(_argv[1]);
+  parse(_argv[1], _argv[2]);
 
   constructBuffers();
 

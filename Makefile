@@ -74,7 +74,7 @@ pdf:
 	evince Project1.pdf
 
 r:
-	./spiderling obj.dat
+	./spiderling obj.dat objs
 
 rd:
 	./spiderling objs.dat
