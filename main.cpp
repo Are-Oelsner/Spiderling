@@ -30,9 +30,6 @@
 #include <sstream>
 #include <memory>
 
-// SOIL
-#include "SOIL.h"
-
 // GL
 #if   defined(OSX) 
 #pragma clang diagnostic push
@@ -47,6 +44,7 @@
 
 // GLM - included in Obj
 // Qt  - included in Obj
+// SOIL - included in Obj
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Spiderling Objects
@@ -63,7 +61,6 @@ Camera cam;
 ////////////////////////////////////////////////////////////////////////////////
 // Object from .obj file specified by argv[1] in main
 vector<unique_ptr<Obj>> objs;
-vector<GLuint> ebos, vbos;
 // Particle Systems
 vector<unique_ptr<ParticleSystem>> ps;
 // Repulsors
@@ -299,96 +296,18 @@ draw() {
   glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
   // Lights
   for(int i = 0; i < lights.size(); i++) {
-
-    glEnable(GL_LIGHT0 + lights[i]->getLight()); // Enables light i
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_AMBIENT, lights[i]->getAmbient());
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_DIFFUSE, lights[i]->getDiffuse());
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_SPECULAR, lights[i]->getSpecular());
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_POSITION, lights[i]->getPosition());
-
-    if(lights[i]->getType() == 1) { // Spotlight/Pointlight exclusive
-      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_DIRECTION, lights[i]->getDirection());
-      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_CUTOFF, lights[i]->getAngularLimit());
-      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_CONSTANT_ATTENUATION, lights[i]->getCAtten());
-      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_LINEAR_ATTENUATION, lights[i]->getLAtten());
-      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_QUADRATIC_ATTENUATION, lights[i]->getQAtten());
-      if(*lights[i]->getAngularLimit() < 180.f) { // Pointlight exclusive
-        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_EXPONENT, lights[i]->getAAtten());
-      }
-    }
+    lights[i]->draw();
   }
-  
+
   glPointSize(5);
 
   // Objects
   for(int i = 0; i < objs.size(); i++) {
-    //objs[i]->draw();
-    glPushMatrix();
-    //Translation
-    glTranslatef((GLfloat) objs[i]->getPosition()[0], (GLfloat)
-        objs[i]->getPosition()[1], (GLfloat) objs[i]->getPosition()[2]);
-    // Rotation
-    // Rotate X
-    glRotatef((GLfloat) objs[i]->getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
-    // Rotate Y
-    glRotatef((GLfloat) objs[i]->getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
-    // Rotate Z
-    glRotatef((GLfloat) objs[i]->getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
-    // Scale 
-    glScalef((GLfloat) objs[i]->getScale()[0], (GLfloat) objs[i]->getScale()[1],
-        (GLfloat) objs[i]->getScale()[2]);
-
-
-    //glActiveTexture(GL_TEXTURE0);// + (unsigned int)i);
-    // Get Data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]); // Bind EBO
-    glBindBuffer(GL_ARRAY_BUFFER, vbos[i]); // Bind VBO
-    if(objs[i]->getBuffer() > 0 && objs[i]->getBuffer() < objs.size()) {
-      // Texture
-      glEnable(GL_TEXTURE_2D);
-      glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
-      glBindTexture(GL_TEXTURE_2D, objs[i]->getBuffer()); // Bind texture
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-      glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
-      glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
-      glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
-      glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getNs());
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
-    }
-    else {//if(objs[i]->getBuffer() <= 0 || objs[i]->getBuffer() > objs.size()) {
-      // Color
-      glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
-      glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
-      glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
-      glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
-      glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getNs());
-    }
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, sizeof(VEC8), (GLvoid*)NULL);
-
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT, sizeof(VEC8), (GLvoid*)(sizeof(glm::vec3)));
-
-    
-    // Draw
-    if(objs[i]->getMode() == 4) // Quads
-      glDrawElements(GL_QUADS, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
-    else                        // Triangles
-      glDrawElements(GL_TRIANGLES, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
-    glDisable(GL_TEXTURE_2D);
-    glPopMatrix();
+    objs[i]->draw();
   }
 
   glColor3f(0.3f, 0.f, 1.f);
+
   // Particle Systems
   for(int i = 0; i < ps.size(); i++) {
     ps[i]->draw();
@@ -462,78 +381,6 @@ void parse(const char* file, const char* directory) {
   objFile.close();
 }
 
-void
-constructBuffers() {
-    for(int i = 0; i < objs.size(); i++) {
-      ////////////////////////////////////////////////////////////////////////////
-      /// Element Buffer Object
-      ////////////////////////////////////////////////////////////////////////////
-      GLuint ebo;
-      glGenBuffers(1, &ebo);
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*objs[i]->getIndices().size(), objs[i]->getIndices().data(), GL_STATIC_DRAW);
-      ebos.emplace_back(ebo);
-
-
-      ////////////////////////////////////////////////////////////////////////////
-      /// Vertex Array Object
-      ////////////////////////////////////////////////////////////////////////////
-      //glGenVertexArrays(1, &vao); 
-      //glBindVertexArray(vao);     // Bind VAO
-
-
-      ////////////////////////////////////////////////////////////////////////////
-      /// Vertex Buffer Object
-      ////////////////////////////////////////////////////////////////////////////
-      GLuint vbo;
-      glGenBuffers(1, &vbo);
-      glBindBuffer(GL_ARRAY_BUFFER, vbo);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(VEC8)*objs[i]->getData().size(), objs[i]->getData().data(), GL_STATIC_DRAW);
-      vbos.emplace_back(vbo);
-
-
-
-      //glBufferSubData(GL_ARRAY_BUFFER, 0, 2 * sizeof(glm::vec3)*objs[i]->getData()->size(), objs[i]->getData()->data());
-
-      /// For without VAO
-      //glEnableClientState(GL_VERTEX_ARRAY);
-      //glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-      //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i]->getVertices()), sizeof(*objs[i]->getNormals()) , objs[i]->getNormals());
-      //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i]->getVertices()));
-      //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
-      
-
-      ////////////////////////////////////////////////////////////////////////////
-      /// Textures -- QOpenGLTexture object initialization
-      ////////////////////////////////////////////////////////////////////////////
-      
-      const char * c = (const char*)objs[i]->getMTL().map_Kd.c_str();
-      cout << c << endl;
-      cout << objs[i]->getMode() << endl;
-      GLuint tex_2d = SOIL_load_OGL_texture(c, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
-      if(tex_2d == 0) {
-        printf("SOIL loading error: '%s'\n", SOIL_last_result());
-        objs[i]->setBuffer(-1);
-      }
-      else{
-        objs[i]->setBuffer(tex_2d);
-        printf("texture id = %u\t i = %u\n", tex_2d, i);
-
-
-        //glActiveTexture(GL_TEXTURE0 + (unsigned int)i);
-        //GLuint text = *objs[i]->getBuffer();
-        //glGenTextures(1, &text);
-        //glBindTexture(GL_TEXTURE_2D, text);
-        //target, level, internalFormat, width, height, border, format, type, *data
-        //GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
-        //TODO TODO start here
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, objs[i]->getMTL().texture->width(), objs[i]->getMTL().texture->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, objs[i]->getMTL().texture);//TODO check
-
-      }
-    }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Main
 
@@ -574,8 +421,6 @@ main(int _argc, char** _argv) {
   //////////////////////////////////////////////////////////////////////////////
   // Parses File and Constructs Objs
   parse(_argv[1], _argv[2]);
-
-  constructBuffers();
 
   //////////////////////////////////////////////////////////////////////////////
   // Start application

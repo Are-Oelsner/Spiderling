@@ -185,3 +185,5 @@ Add in command line parser from networks project 1 for light data parser so I ca
 
 TODO fix loading from objs subdirectory. Can FILE fopen access subdirectories?
 ofour moose switch for texture lighting effects
+
+Don't need to store recursive tree for ray tracing algorithm.

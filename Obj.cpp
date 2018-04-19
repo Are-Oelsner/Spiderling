@@ -4,6 +4,9 @@
 #include <string.h>
 #include <stdexcept>
 
+// SOIL
+#include "SOIL.h"
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,7 +19,8 @@ Obj(string input, string dir) {
   loadOBJ(filename, directory);
   constructData();
   initTransforms();
-  //constructBuffers();
+  constructBuffers();
+  cout << "Constructed Buffers" << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -25,64 +29,56 @@ void
 Obj::
 draw() {
   glPushMatrix();
-  // Translation
-  glTranslatef((GLfloat) getPosition()[0], (GLfloat)
-      getPosition()[1], (GLfloat) getPosition()[2]);
-  // Rotation
-  // Rotate X
+  //Translation
+  glTranslatef((GLfloat) getPosition()[0], (GLfloat) getPosition()[1], (GLfloat) getPosition()[2]);
+  // Rotation X, Y, Z
   glRotatef((GLfloat) getRotation()[0], (GLfloat) 1, (GLfloat) 0,(GLfloat) 0);
-  // Rotate Y
   glRotatef((GLfloat) getRotation()[1], (GLfloat) 0, (GLfloat) 1,(GLfloat) 0);
-  // Rotate Z
   glRotatef((GLfloat) getRotation()[2], (GLfloat) 0, (GLfloat) 0,(GLfloat) 1);
   // Scale 
-  glScalef((GLfloat) getScale()[0], (GLfloat) getScale()[1],
-      (GLfloat) getScale()[2]);
+  glScalef((GLfloat) getScale()[0], (GLfloat) getScale()[1], (GLfloat) getScale()[2]);
 
   // Get Data
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); // Bind EBO
   glBindBuffer(GL_ARRAY_BUFFER, vbo); // Bind VBO
+  if(getBuffer() > 0 && getBuffer() < 1000) { // Texture
+    glEnable(GL_TEXTURE_2D);
+    glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
+    glBindTexture(GL_TEXTURE_2D, getBuffer()); // Bind texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   getKa());
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   getKd());
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  getKs());
+    glMaterialfv(GL_FRONT, GL_SHININESS, getNs());
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
+  } else {// Color
+    glColor3f(getColor()[0], getColor()[1], getColor()[2]);
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   getKa());
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   getKd());
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  getKs());
+    glMaterialfv(GL_FRONT, GL_SHININESS, getNs());
+  }
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, sizeof(VEC8), (GLvoid*)NULL);
 
   glEnableClientState(GL_NORMAL_ARRAY);
   glNormalPointer(GL_FLOAT, sizeof(VEC8), (GLvoid*)(sizeof(glm::vec3)));
 
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
-
-  glColor4f((GLfloat) getColor()[0], (GLfloat) getColor()[1], (GLfloat) getColor()[2], (GLfloat) getColor()[3]);
-//// Textures
-//if(material.map_Kd != "") {
-//  const char * c = (const char*)&material.map_Kd;
-//  printf("before QOpenGLTexture creation\n");
-//  material.texture = new QOpenGLTexture(QImage(QString(c)).mirrored());
-//  //material.texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-//  //material.texture->setMagnificationFilter(QOpenGLTexture::Linear);
-//  printf("at end\n");
-//}
-
-//glEnable(GL_TEXTURE_2D);
-////material.texture->bind();
-////target, level, internalFormat, width, height, border, format, type, *data
-////GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
-//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, material.texture->width(), material.texture->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, material.texture);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-//glMaterialfv(GL_FRONT, GL_AMBIENT,  getKa());
-//glMaterialfv(GL_FRONT, GL_DIFFUSE,  getKd());
-//glMaterialfv(GL_FRONT, GL_SPECULAR, getKs());
-//glMaterialfv(GL_FRONT, GL_EMISSION, getKs());
-//glMaterialfv(GL_FRONT, GL_SHININESS, getKs());
-
   // Draw
-  if(getMode() == 4) // Quads
+  if(getMode() == 4) {// Quads
     glDrawElements(GL_QUADS, getIndices().size(), GL_UNSIGNED_INT, 0);
-  else                        // Triangles
+  } else {                        // Triangles
     glDrawElements(GL_TRIANGLES, getIndices().size(), GL_UNSIGNED_INT, 0);
-  //glDisable(GL_TEXTURE_2D);
+  }
+  glDisable(GL_TEXTURE_2D);
   glPopMatrix();
 }
 
@@ -156,7 +152,6 @@ constructBuffers() {
   ////////////////////////////////////////////////////////////////////////////
   /// Vertex Buffer Object
   ////////////////////////////////////////////////////////////////////////////
-  GLuint vbo;
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(VEC8)*getData().size(), getData().data(), GL_STATIC_DRAW);
@@ -171,6 +166,23 @@ constructBuffers() {
   //glBufferSubData(GL_ARRAY_BUFFER, sizeof(*objs[i]->getVertices()), sizeof(*objs[i]->getNormals()) , objs[i]->getNormals());
   //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)sizeof(*objs[i]->getVertices()));
   //glEnableVertexAttribArray(1); // Enables attribute index 1 as being used
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// Textures -- QOpenGLTexture object initialization
+  ////////////////////////////////////////////////////////////////////////////
+
+  const char * c = (const char*)getMTL().map_Kd.c_str();
+  cout << c << endl;
+  cout << getMode() << endl;
+  GLuint tex_2d = SOIL_load_OGL_texture(c, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+  if(tex_2d == 0) {
+    printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    setBuffer(-1);
+  }
+  else{
+    setBuffer(tex_2d);
+    printf("texture id = %u\n", tex_2d);
+  }
 }
 
 
@@ -304,7 +316,7 @@ loadMTL(const char* filename, const char* directory) {
     // Ka 
     else if(strcmp(lineHeader, "Ka") == 0) {
       tmp=fscanf(file, "%f %f %f\n", &material.Ka.x, &material.Ka.y, &material.Ka.z);
-      
+
     }
     // Kd
     else if(strcmp(lineHeader, "Kd") == 0) {
@@ -384,6 +396,7 @@ print(bool debug) {
   printf("mode: %u\t#vertices: %lu\t#uvs: %lu\t#normals: %lu\n#faces: %lu\t#vertIndices: %lu\ndata: %lu\tindices:%lu\n", mode, vertices.size(), uvs.size(), normals.size(), vertices.size()/mode, vertexIndices.size(), data.size(), indices.size());
   printf("Material-- Ka: (%f, %f, %f)\tKd: (%f, %f, %f)\tKs: (%f, %f, %f)\n", material.Ka.x, material.Ka.y, material.Ka.z, material.Kd.x, material.Kd.y, material.Kd.z, material.Ks.x, material.Ks.y, material.Ks.z);
   printf("map_Kd: %s\td: %f\tNs: %f\tillum: %u\n", material.map_Kd.c_str(), material.d, material.Ns, material.illum);
+  printf("vbo: %u\tebo: %u\n", vbo, ebo);
   if(debug) {
     for(int i = 0; i < (int)indices.size(); i++) {
       printf("%u\t(%f,%f)\t(%f,%f)\t(%f,%f)\n", indices[i], data[indices[i]].vert[0], data[indices[i]].norm[0], data[indices[i]].vert[1], data[indices[i]].norm[1], data[indices[i]].vert[2], data[indices[i]].norm[2]);
