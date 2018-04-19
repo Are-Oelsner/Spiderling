@@ -108,7 +108,7 @@ resize(GLint _w, GLint _h) {
   // Projection
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45.f, GLfloat(m_window.width())/m_window.height(), 0.01f, 100.f);
+  gluPerspective(45.f, GLfloat(m_window.width())/m_window.height(), 0.01f, 1000.f);
 }
 
 
@@ -294,19 +294,19 @@ draw() {
   // Camera
   cam.draw();
 
-  glPointSize(50);
+  glEnable(GL_LIGHTING);
+  glPointSize(30);
   glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
   // Lights
   //glBegin(GL_POINTS);
   for(int i = 0; i < lights.size(); i++) {
     glPushMatrix();
-    glEnable(GL_LIGHTING);
 
     glEnable(GL_LIGHT0 + lights[i]->getLight()); // Enables light i
-    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_POSITION, lights[i]->getPosition());
     glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_AMBIENT, lights[i]->getAmbient());
     glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_DIFFUSE, lights[i]->getDiffuse());
     glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_SPECULAR, lights[i]->getSpecular());
+    glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_POSITION, lights[i]->getPosition());
 
     if(lights[i]->getType() == 1) { // Spotlight/Pointlight exclusive
       glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_DIRECTION, lights[i]->getDirection());
@@ -318,15 +318,8 @@ draw() {
         glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_QUADRATIC_ATTENUATION, lights[i]->getQAtten());
       }
     }
-
-    //glDisable(GL_LIGHT0 + lights[i]->getLight()); // Disables light i
-    if(lights[i]->getPosition(3) > 0.1) {
-      glColor3f(9.f, 8.f, 7.f);
-      glVertex3f((GLfloat) lights[i]->getPosition(0), (GLfloat) lights[i]->getPosition(1), (GLfloat) lights[i]->getPosition(2));
-    }
     glPopMatrix();
   }
-  glEnd();
   
   glPointSize(5);
 
@@ -363,6 +356,7 @@ draw() {
       glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
       glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
       glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       glTexCoordPointer(2, GL_FLOAT, sizeof(VEC8), (GLvoid*)(2*sizeof(glm::vec3)));
@@ -370,7 +364,6 @@ draw() {
     else {//if(objs[i]->getBuffer() <= 0 || objs[i]->getBuffer() > objs.size()) {
       // Color
       glColor3f(objs[i]->getColor()[0], objs[i]->getColor()[1], objs[i]->getColor()[2]);
-      glDisable(GL_TEXTURE_2D);
       glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
       glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
       glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
@@ -390,7 +383,7 @@ draw() {
       glDrawElements(GL_QUADS, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
     else                        // Triangles
       glDrawElements(GL_TRIANGLES, objs[i]->getIndices().size(), GL_UNSIGNED_INT, 0);
-    //glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D);
     glPopMatrix();
   }
 
@@ -515,6 +508,8 @@ constructBuffers() {
       ////////////////////////////////////////////////////////////////////////////
       
       const char * c = (const char*)objs[i]->getMTL().map_Kd.c_str();
+      cout << c << endl;
+      cout << objs[i]->getMode() << endl;
       GLuint tex_2d = SOIL_load_OGL_texture(c, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
       if(tex_2d == 0) {
         printf("SOIL loading error: '%s'\n", SOIL_last_result());
@@ -534,6 +529,7 @@ constructBuffers() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         //target, level, internalFormat, width, height, border, format, type, *data
         //GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
         //TODO TODO start here

@@ -17,10 +17,10 @@ Camera() {
   g_theta = 0.f;
   m_eye[0] = 0;
   m_eye[1] = 20;
-  m_eye[2] = 40;
+  m_eye[2] = 60;
 
   c_theta[0] = 0;
-  c_theta[1] = 0;
+  c_theta[1] = 15;
   c_theta[2] = 0;
 
   m_at[0] = 0;
@@ -52,8 +52,6 @@ draw() {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   gluLookAt(eye(0), eye(1), eye(2), at(0), at(1), at(2), getUp(0), getUp(1), getUp(2)); 
-  //gluLookAt(cam.eX()*std::sin(cam.theta(), cam.eY(), cam.eZ()*std::cos(cam.theta()),
-  //gluLookAt(10*std::sin(cam.theta()), 0.f, 10*std::cos(cam.theta()), 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 }
 
 
@@ -63,7 +61,7 @@ reset() {
   g_theta = 0.f;
   m_eye[0] = 0;
   m_eye[1] = 20;
-  m_eye[2] = 60;
+  m_eye[2] = 80;
 
   m_at[0] = 0;
   m_at[1] = 15;

@@ -11039,3 +11039,71 @@ main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
  Light.h SOIL.h
 main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
  Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+ParticleSystem.o: ParticleSystem.cpp ParticleSystem.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+Camera.o: Camera.cpp Camera.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+Camera.o: Camera.cpp Camera.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+Camera.o: Camera.cpp Camera.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h
+main.o: main.cpp Obj.h Vec.h WindowClass.h Camera.h ParticleSystem.h \
+ Light.h SOIL.h

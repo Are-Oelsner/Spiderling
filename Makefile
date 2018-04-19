@@ -77,10 +77,10 @@ r:
 	./spiderling obj.dat objs
 
 rd:
-	./spiderling objs.dat
+	./spiderling obj1.dat objs
 
 p:
-	./spiderling PS.dat 0
+	./spiderling PS.dat objs
 
 gdb:
 	gdb spiderling
