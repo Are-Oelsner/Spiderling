@@ -102,6 +102,7 @@ class Obj {
     float* getKa()  {return &material.Ka[0];}        // returns ambient vector
     float* getKd()  {return &material.Kd[0];}        // returns diffuse vector
     float* getKs()  {return &material.Ks[0];}       // returns specular vector
+    float* getNs()  {return &material.Ns;}
     GLuint getBuffer() {return material.buffer;}  // returns texture buffer number 
     void setBuffer(GLuint buff) {material.buffer = buff;}  // returns texture buffer number 
 

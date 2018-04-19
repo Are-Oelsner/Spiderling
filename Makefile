@@ -76,6 +76,9 @@ pdf:
 r:
 	./spiderling obj.dat objs
 
+rs:
+	./spiderling objs.dat objs
+
 rd:
 	./spiderling obj1.dat objs
 

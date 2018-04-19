@@ -184,3 +184,4 @@ working on light.h line 28. Need to finish light constructors, light input parsi
 Add in command line parser from networks project 1 for light data parser so I can specify with -char
 
 TODO fix loading from objs subdirectory. Can FILE fopen access subdirectories?
+ofour moose switch for texture lighting effects

@@ -298,9 +298,7 @@ draw() {
   glPointSize(30);
   glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
   // Lights
-  //glBegin(GL_POINTS);
   for(int i = 0; i < lights.size(); i++) {
-    glPushMatrix();
 
     glEnable(GL_LIGHT0 + lights[i]->getLight()); // Enables light i
     glLightfv(GL_LIGHT0 + lights[i]->getLight(), GL_AMBIENT, lights[i]->getAmbient());
@@ -311,14 +309,13 @@ draw() {
     if(lights[i]->getType() == 1) { // Spotlight/Pointlight exclusive
       glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_DIRECTION, lights[i]->getDirection());
       glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_CUTOFF, lights[i]->getAngularLimit());
-      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_EXPONENT, lights[i]->getAAtten());
-      if(*lights[i]->getAngularLimit() == 180.f) { // Pointlight exclusive
-        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_CONSTANT_ATTENUATION, lights[i]->getCAtten());
-        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_LINEAR_ATTENUATION, lights[i]->getLAtten());
-        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_QUADRATIC_ATTENUATION, lights[i]->getQAtten());
+      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_CONSTANT_ATTENUATION, lights[i]->getCAtten());
+      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_LINEAR_ATTENUATION, lights[i]->getLAtten());
+      glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_QUADRATIC_ATTENUATION, lights[i]->getQAtten());
+      if(*lights[i]->getAngularLimit() < 180.f) { // Pointlight exclusive
+        glLightfv(GL_LIGHT0+lights[i]->getLight(), GL_SPOT_EXPONENT, lights[i]->getAAtten());
       }
     }
-    glPopMatrix();
   }
   
   glPointSize(5);
@@ -351,11 +348,16 @@ draw() {
       glEnable(GL_TEXTURE_2D);
       glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
       glBindTexture(GL_TEXTURE_2D, objs[i]->getBuffer()); // Bind texture
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
       glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
       glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
       glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
-      glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
-      glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
+      glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getNs());
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -367,8 +369,7 @@ draw() {
       glMaterialfv(GL_FRONT, GL_AMBIENT,   objs[i]->getKa());
       glMaterialfv(GL_FRONT, GL_DIFFUSE,   objs[i]->getKd());
       glMaterialfv(GL_FRONT, GL_SPECULAR,  objs[i]->getKs());
-      glMaterialfv(GL_FRONT, GL_EMISSION,  objs[i]->getKs());
-      glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getKs());
+      glMaterialfv(GL_FRONT, GL_SHININESS, objs[i]->getNs());
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -524,12 +525,6 @@ constructBuffers() {
         //GLuint text = *objs[i]->getBuffer();
         //glGenTextures(1, &text);
         //glBindTexture(GL_TEXTURE_2D, text);
-        glBindTexture(GL_TEXTURE_2D, tex_2d);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         //target, level, internalFormat, width, height, border, format, type, *data
         //GLenum, GLint, GLint,       GLsizei, GLsizei, GLint, GLenum, GLenum, constGLvoid*
         //TODO TODO start here
