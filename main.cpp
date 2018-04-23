@@ -17,7 +17,6 @@
 #include "Obj.h"
 #include "WindowClass.h"
 #include "Camera.h"
-#include "ParticleSystem.h"
 #include "Light.h"
 
 // STL
@@ -43,7 +42,6 @@
 #endif
 
 // GLM - included in Obj
-// Qt  - included in Obj
 // SOIL - included in Obj
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,11 +59,6 @@ Camera cam;
 ////////////////////////////////////////////////////////////////////////////////
 // Object from .obj file specified by argv[1] in main
 vector<unique_ptr<Obj>> objs;
-// Particle Systems
-vector<unique_ptr<ParticleSystem>> ps;
-// Repulsors
-vector<struct Repulsor> repulsors;
-int rep = 0;
 // Lights
 vector<unique_ptr<Light>> lights;
 
@@ -154,41 +147,6 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       std::cout << "Model Display: Points" << std::endl;
       glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
       break;
-    case 121:       // y    switch to next repulsor/attractor
-      //cam.hLook(.2);
-      rep = (rep+1) % repulsors.size();
-      printf("%u\n", rep);
-      break;
-    case 117:       // u    move repulsor left
-      //cam.hLook(.2);
-      if(repulsors.size() > rep)
-        repulsors[rep].position[0] -= 1;
-      break;
-    case 105:       // i    move repulsor down
-      //cam.hLook(-.2);
-      if(repulsors.size() > rep)
-        repulsors[rep].position[1] -= 1;
-      break;
-    case 111:       // o    move repulsor up
-      //cam.hLook(.2);
-      if(repulsors.size() > rep)
-        repulsors[rep].position[1] += 1;
-      break;
-    case 112:       // p    move repulsor right
-      //cam.hLook(.2);
-      if(repulsors.size() > rep)
-        repulsors[rep].position[0] += 1;
-      break;
-    case 91:       // [    move repulsor closer
-      //cam.hLook(.2);
-      if(repulsors.size() > rep)
-        repulsors[rep].position[2] += 1;
-      break;
-    case 93:       // ]    move repulsor further away
-      //cam.hLook(.2);
-      if(repulsors.size() > rep)
-        repulsors[rep].position[2] -= 1;
-      break;
     case 119:       // w    look up
       cam.at(1, 0.5);
       break;
@@ -256,24 +214,6 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   }
 }
 
-Repulsor 
-makeRepulsor(string filename) {
-  struct Repulsor repulsor;
-  char* input = (char*) filename.c_str();
-  char* tmp = strtok(input, " ");
-  if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor.position[0] = atof(tmp);
-  if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor.position[1] = atof(tmp);
-  if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor.position[2] = atof(tmp);
-  if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor.mass = atof(tmp);
-  if((tmp = strtok(NULL, " ")) != NULL)
-    repulsor.state = atoi(tmp);
-  return repulsor;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief Draw function for single frame
 void
@@ -284,6 +224,8 @@ draw() {
   // Clear
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glEnable(GL_LIGHTING);
+  glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
 
   //////////////////////////////////////////////////////////////////////////////
   // Draw
@@ -291,9 +233,7 @@ draw() {
   // Camera
   cam.draw();
 
-  glEnable(GL_LIGHTING);
-  glPointSize(30);
-  glColor3f((GLfloat) 1., (GLfloat) 1., (GLfloat) 1.);
+  
   // Lights
   for(int i = 0; i < lights.size(); i++) {
     lights[i]->draw();
@@ -305,23 +245,6 @@ draw() {
   for(int i = 0; i < objs.size(); i++) {
     objs[i]->draw();
   }
-
-  glColor3f(0.3f, 0.f, 1.f);
-
-  // Particle Systems
-  for(int i = 0; i < ps.size(); i++) {
-    ps[i]->draw();
-    ps[i]->update(repulsors);
-  }
-
-  // Repulsors/Attractors
-  glPointSize(20);
-  glBegin(GL_POINTS);
-  for(int i = 0; i < repulsors.size(); i++) {
-    glColor3f((GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state, (GLfloat) repulsors.at(i).state);
-    glVertex3f((GLfloat) repulsors.at(i).position[0], (GLfloat) repulsors.at(i).position[1], (GLfloat) repulsors.at(i).position[2]);
-  }
-  glEnd();
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -342,36 +265,20 @@ void parse(const char* file, const char* directory) {
   string filename;
   string dir = directory;
   size_t foundobj; // found object
-  size_t foundpar; // found particle system
-  size_t foundrep; // found repulsor
   size_t foundlgt; // found light
   printf("################################################################################");
   while(getline(objFile, filename)) {
     printf("\n");
     foundobj = filename.find(".obj");
-    foundpar = filename.find(".par");
-    foundrep = filename.find(".rep");
     foundlgt = filename.find("light");
-    if(foundrep == string::npos && foundobj == string::npos && foundpar != string::npos && foundlgt == string::npos) {
-      filename.insert(0, 1, '/');
-      filename.insert(0, dir);
-      ps.emplace_back(new ParticleSystem(filename));
-      printf("Particle System: %s\n", filename.c_str());
-      ps.back()->print();
-    }
-    else if(foundobj != string::npos && foundpar == string::npos && foundrep == string::npos && foundlgt == string::npos)  {
+    if(foundobj != string::npos && foundlgt == string::npos)  {
       filename.insert(0, 1, '/');
       filename.insert(0, dir);
       objs.emplace_back(new Obj(filename, dir));
       printf("Object: %s\n", filename.c_str());
       objs.back()->print(false);
     }
-    else if(foundrep != string::npos && foundobj == string::npos && foundpar == string::npos && foundlgt == string::npos)  {
-      repulsors.emplace_back(makeRepulsor(filename));
-      printf("Repulsor: %s\n", filename.c_str());
-      //repulsors.back()->print();
-    }
-    else if(foundlgt != string::npos && foundobj == string::npos && foundpar == string::npos && foundrep == string::npos) {
+    else if(foundlgt != string::npos && foundobj == string::npos) {
       lights.emplace_back(new Light(filename, lights.size()));
       printf("Light: %s\n", filename.c_str());
       lights.back()->print();
@@ -399,7 +306,7 @@ main(int _argc, char** _argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowPosition(50, 100);
   glutInitWindowSize(m_window.width(), m_window.height()); // HD size
-  m_window.window(glutCreateWindow("Spiderling: A Rudimentary Game Engine"));
+  m_window.window(glutCreateWindow("Spiderling: A Rudimentary Ray Tracer"));
 
   // Input Error
   if(_argc != 3) { 
@@ -425,7 +332,8 @@ main(int _argc, char** _argv) {
   //////////////////////////////////////////////////////////////////////////////
   // Start application
   std::cout << "Starting Application" << std::endl;
-  glutMainLoop();
+  glutMainLoop(); 
+  // can move camera by changing camera coordinates and applying transformation to camera coordinates to scene. 
 
   return 0;
 }

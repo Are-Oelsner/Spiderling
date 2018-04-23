@@ -1,4 +1,5 @@
 # Spiderling
+Author: Are Oelsner
 CMSC 335 Graphics Engine
 Project 5: Ray Tracer
 
@@ -6,7 +7,22 @@ Project 5: Ray Tracer
 /////////////////////////////////////////////////////////////////////////////////////////
 ///Notes
 /////////////////////////////////////////////////////////////////////////////////////////
-Don't need to store recursive tree for ray tracing algorithm.
+Don't need to store recursive tree for ray tracing algorithm. That is done by the recursive stack.
+Ask Jory about the function he mentioned for constructing spheres in GL and how I could add support for that for my obj parser.
+remove timer function that calls glutpost redisplay
+set up so I can push a key and it re-raytraces
+no projection matrix, no scan line conversion, just shoot rays into the scene and use collision detection.
+Textbook page 634
+
+Terminate a ray tracing path if any of the following conditions are satisfied
+    Ray doesn't intersect any surfaces
+    Ray intersects a light source that is not a reflecting surface (almost never happens)
+    The tree has been generated to its maximum allowable depth.
+
+Functions to find/implement:
+  Collision detection
+    Sphere, Quad, Maybe Triangle
+  Ray Tracing Algorithm with just Reflection
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
