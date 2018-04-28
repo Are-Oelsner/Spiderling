@@ -14,7 +14,7 @@
 // Includes
 
 // My Files
-#include "Obj.h"
+#include "RayTracer.h"
 #include "WindowClass.h"
 #include "Camera.h"
 #include "Light.h"
@@ -41,9 +41,6 @@
 #include <GL/glx.h>
 #endif
 
-// GLM - included in Obj
-// SOIL - included in Obj
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Spiderling Objects
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,10 +54,13 @@ WindowClass m_window;
 Camera cam;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Object from .obj file specified by argv[1] in main
-vector<unique_ptr<Obj>> objs;
+/// Objects
 // Lights
 vector<unique_ptr<Light>> lights;
+// Spheres
+vector<unique_ptr<Sphere>> spheres;
+// GroundPlane
+GroundPlane gp;
 
 // Frame rate
 const unsigned int FPS = 60;

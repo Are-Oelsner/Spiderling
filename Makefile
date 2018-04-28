@@ -37,11 +37,14 @@ INCL = $(GL_INCL) -I /usr/include/x86_64-linux-gnu/qt5
 LIBS = $(GL_LIBS)
 
 OBJS = WindowClass.o\
+			 RayTracer.o\
+			 Ray.o\
+			 Collision.o\
+			 Sphere.o\
+			 GroundPlane.o\
 			 Camera.o\
 			 Light.o\
-			 Obj.o\
 			 Vec.o\
-			 ParticleSystem.o\
        main.o
 
 EXECUTABLE = spiderling
