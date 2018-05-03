@@ -71,7 +71,7 @@ os:
 	vim main.cpp +":tabf ParticleSystem.cpp" +":vsplit ParticleSystem.h" +":tabf Obj.cpp" +":vsplit Obj.h" +":tabf Camera.cpp" +":vsplit Camera.h" +":tabf Vec.cpp" +":vsplit Vec.h" +":tabf PS.dat" +":vsplit smoke.par" +":tabf README.md"
 
 o:
-	vim main.cpp +":tabf Light.cpp" +":vsplit Light.h" +":tabf Obj.cpp" +":vsplit Obj.h" +":tabf README.md"
+	vim main.cpp +":tabf RayTracer.cpp" +":vsplit RayTracer.h" +":tabf Ray.cpp" +":vsplit Ray.h" +":tabf Collision.cpp" +":vsplit Collision.h" +":tabf README.md"
 
 pdf:
 	evince Project1.pdf
