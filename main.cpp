@@ -18,6 +18,8 @@
 #include "WindowClass.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Sphere.h"
+#include "GroundPlane.h"
 
 // STL
 #include <cmath>
@@ -28,6 +30,7 @@
 #include <vector>
 #include <sstream>
 #include <memory>
+#include <tinyxml.h>
 
 // GL
 #if   defined(OSX) 
@@ -47,20 +50,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Window
-WindowClass m_window;
+shared_ptr<WindowClass> m_window = make_shared<WindowClass>();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Camera
-Camera cam;
+shared_ptr<Camera> cam = make_shared<Camera>();
 
-////////////////////////////////////////////////////////////////////////////////
-/// Objects
-// Lights
-vector<unique_ptr<Light>> lights;
-// Spheres
-vector<unique_ptr<Sphere>> spheres;
-// GroundPlane
-GroundPlane gp;
+unique_ptr<RayTracer> rayTracer;
+
 
 // Frame rate
 const unsigned int FPS = 60;
@@ -89,16 +86,16 @@ initialize() {
 /// Responsible for setting window size (viewport) and projection matrix.
 void
 resize(GLint _w, GLint _h) {
-  m_window.width(_w);
-  m_window.height(_h);
+  m_window->width(_w);
+  m_window->height(_h);
 
   // Viewport
-  glViewport(0, 0, m_window.width(), m_window.height());
+  glViewport(0, 0, m_window->width(), m_window->height());
 
   // Projection
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45.f, GLfloat(m_window.width())/m_window.height(), 0.01f, 1000.f);
+  gluPerspective(45.f, GLfloat(m_window->width())/m_window->height(), 0.01f, 1000.f);
 }
 
 
@@ -109,7 +106,7 @@ resize(GLint _w, GLint _h) {
 /// Note, this is rudametary and fragile.
 void
 timer(int _v) {
-  if(m_window.window() != 0) {
+  if(m_window->window() != 0) {
     glutPostRedisplay();
 
     g_delay = std::max(0.f, 1.f/FPS - g_frameRate);
@@ -131,9 +128,9 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
   switch(_key) {
     // Escape key : quit application
     case 27:
-      std::cout << "Destroying window: " << m_window.window() << std::endl;
-      glutDestroyWindow(m_window.window());
-      m_window.window(0);
+      std::cout << "Destroying window: " << m_window->window() << std::endl;
+      glutDestroyWindow(m_window->window());
+      m_window->window(0);
       break;
     case 106:       // j    display filled shape
       std::cout << "Model Display: Filled" << std::endl;
@@ -148,30 +145,30 @@ keyPressed(GLubyte _key, GLint _x, GLint _y) {
       glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
       break;
     case 119:       // w    look up
-      cam.at(1, 0.5);
+      cam->at(1, 0.5);
       break;
     case 115:       // s    look down
-      cam.at(1, -0.5);
+      cam->at(1, -0.5);
       break;
     case 97:        // a    look left
-      cam.at(0, -0.5);
+      cam->at(0, -0.5);
       break;
     case 100:       // d    look right
-      cam.at(0, 0.5);
+      cam->at(0, 0.5);
       break;
     case 114:       // r    reset camera
-      cam.reset();
+      cam->reset();
       break;
     case 113:       // q    zoom out
-      cam.eye(2, 0.5);
-      cam.at(2, 0.5);
+      cam->eye(2, 0.5);
+      cam->at(2, 0.5);
       break;
     case 101:       // e    zoom in
-      cam.eye(2, -0.5);
-      cam.at(2, -0.5);
+      cam->eye(2, -0.5);
+      cam->at(2, -0.5);
       break;
       //case 116:       // t    test transform
-      //  cam.mTransform();
+      //  cam->mTransform();
       //  break;
       // Unhandled
     default:
@@ -190,22 +187,22 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   switch(_key) {
     // Arrow keys
     case GLUT_KEY_LEFT:
-      //cam.translate(-.1, 0, 0);
-      cam.eye(0, -.1);
-      cam.at(0, -0.1);
+      //cam->translate(-.1, 0, 0);
+      cam->eye(0, -.1);
+      cam->at(0, -0.1);
       break;
     case GLUT_KEY_RIGHT:
-      //cam.translate(.1, 0, 0);
-      cam.eye(0, 0.1);
-      cam.at(0, 0.1);
+      //cam->translate(.1, 0, 0);
+      cam->eye(0, 0.1);
+      cam->at(0, 0.1);
       break;
     case GLUT_KEY_UP:
-      cam.eye(1, 0.3);
-      cam.at(1, 0.3);
+      cam->eye(1, 0.3);
+      cam->at(1, 0.3);
       break;
     case GLUT_KEY_DOWN:
-      cam.eye(1, -0.3);
-      cam.at(1, -0.3);
+      cam->eye(1, -0.3);
+      cam->at(1, -0.3);
       break;
       // Unhandled
     default:
@@ -231,20 +228,9 @@ draw() {
   // Draw
 
   // Camera
-  cam.draw();
+  cam->draw();//TODO remove this?
 
-  
-  // Lights
-  for(int i = 0; i < lights.size(); i++) {
-    lights[i]->draw();
-  }
-
-  glPointSize(5);
-
-  // Objects
-  for(int i = 0; i < objs.size(); i++) {
-    objs[i]->draw();
-  }
+  //rayTracer.draw();
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -259,33 +245,18 @@ draw() {
   //printf("FPS: %6.2f\n", g_framesPerSecond);
 }
 
-void parse(const char* file, const char* directory) {
-  ifstream objFile;
-  objFile.open(file);
-  string filename;
-  string dir = directory;
-  size_t foundobj; // found object
-  size_t foundlgt; // found light
-  printf("################################################################################");
-  while(getline(objFile, filename)) {
-    printf("\n");
-    foundobj = filename.find(".obj");
-    foundlgt = filename.find("light");
-    if(foundobj != string::npos && foundlgt == string::npos)  {
-      filename.insert(0, 1, '/');
-      filename.insert(0, dir);
-      objs.emplace_back(new Obj(filename, dir));
-      printf("Object: %s\n", filename.c_str());
-      objs.back()->print(false);
-    }
-    else if(foundlgt != string::npos && foundobj == string::npos) {
-      lights.emplace_back(new Light(filename, lights.size()));
-      printf("Light: %s\n", filename.c_str());
-      lights.back()->print();
-    }
+void parse(const char* file) {
+  TiXmlDocument doc(file);
+  bool loadOkay = doc.LoadFile();
+  if (loadOkay)
+  {
+    printf("\n%s:\n", file);
+    //TODO
   }
-  printf("################################################################################\n");
-  objFile.close();
+  else
+  {
+    printf("Failed to load file \"%s\"\n", file);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -305,8 +276,8 @@ main(int _argc, char** _argv) {
   glutInit(&_argc, _argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowPosition(50, 100);
-  glutInitWindowSize(m_window.width(), m_window.height()); // HD size
-  m_window.window(glutCreateWindow("Spiderling: A Rudimentary Ray Tracer"));
+  glutInitWindowSize(m_window->width(), m_window->height()); // HD size
+  m_window->window(glutCreateWindow("Spiderling: A Rudimentary Ray Tracer"));
 
   // Input Error
   if(_argc != 3) { 
@@ -327,7 +298,11 @@ main(int _argc, char** _argv) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Parses File and Constructs Objs
-  parse(_argv[1], _argv[2]);
+  char* tmp = _argv[1];
+  string file = (string)tmp;
+  rayTracer = make_unique<RayTracer>(file, m_window, cam);
+  parse(_argv[1]);
+  // TODO add groundplane and light parsing
 
   //////////////////////////////////////////////////////////////////////////////
   // Start application

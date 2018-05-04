@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<file>
+  <Objects>
+    <Spheres>
+      <sphere>
+        <radius>4</radius>
+        <position><x>0</x><y>0</y><z>0</z></position>
+        <rotation><x>0</x><y>0</y><z>0</z></rotation>
+        <scale><x>0</x><y>0</y><z>0</z></scale>
+        <color><r>0</r><g>0</g><b>0</b><a>1</a></color>
+      </sphere>
+    </Spheres>
+    <GroundPlanes>
+      <groundplane>
+        <normal><x>0</x><y>0</y><z>0</z></normal>
+        <position><x>0</x><y>0</y><z>0</z></position>
+        <rotation><x>0</x><y>0</y><z>0</z></rotation>
+        <scale><x>0</x><y>0</y><z>0</z></scale>
+        <color><r>0</r><g>0</g><b>0</b><a>1</a></color>
+      </groundplane>
+    </GroundPlanes>
+  </Objects>
+  <Lights>
+    <light>
+      <position><x>0</x><y>0</y><z>0</z></position>
+      <color><r>0</r><g>0</g><b>0</b><a>1</a></color>
+    </light>
+  </Lights>
+</file>

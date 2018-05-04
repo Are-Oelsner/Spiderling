@@ -23,7 +23,7 @@ endif
 ################################################################################
 # Open gl
 ifeq "$(OS)" "LINUX"
-  GL_LIBS = -lglut -lGLU -lGL -lGLEW -lQt5Gui -lQt5Core -lSOIL
+  GL_LIBS = -lglut -lGLU -lGL -lGLEW -lQt5Gui -lQt5Core -lSOIL -ltinyxml
 else
   ifeq "$(OS)" "OSX"
   GL_LIBS = -framework GLUT -framework OpenGL
@@ -37,6 +37,7 @@ INCL = $(GL_INCL) -I /usr/include/x86_64-linux-gnu/qt5
 LIBS = $(GL_LIBS)
 
 OBJS = WindowClass.o\
+			 Obj.o\
 			 RayTracer.o\
 			 Ray.o\
 			 Collision.o\

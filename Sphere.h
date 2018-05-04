@@ -1,17 +1,23 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
 
-#include <glm/vec4.hpp>
+#include "Obj.h"
 
-class Sphere {
-  public:
+class Sphere : public Obj {
+  private:
     ///Variables
-    glm::vec4 position;
-    float radius = 1;
+    float radius = 3;
 
+  public:
+    /// Contructors
     Sphere();
-    Sphere(glm::vec4 pos, float rad);
-  //public ?void? collision(?);
+    Sphere(glm::vec3 pos, float rad);
+    ~Sphere() {};
+
+    /// Functions
+    // Getters
+    const float getRadius() {return radius;}
+    Collision collide(Ray ray);
 };
 
 #endif

@@ -3,6 +3,17 @@ Author: Are Oelsner
 CMSC 335 Graphics Engine
 Project 5: Ray Tracer
 
+Help from
+homepages.paradise.net.nz/nickamy/simpleraytracer.htm
+kylehalladay.com/blog/tutorial/math/2013/12/24/Ray-Sphere-Intersection.html
+
+Questions:
+Sphere::getDistanceUntilHit checking that an object is instantialized
+Lighting for rayTracing?
+RayTrace algorithm recursion?
+including collision as parameter to rayTrace algorithm
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 ///Notes

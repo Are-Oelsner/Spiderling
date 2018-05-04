@@ -23,7 +23,7 @@ class Camera {
     glm::vec4 m_eye;
     glm::mat4 m_translation;
 
-    // Specifies poition of the reference point
+    // Specifies position of the reference point
     glm::vec4 m_at;
     glm::vec4 c_theta;
 
@@ -49,7 +49,9 @@ class Camera {
     float theta() {return g_theta;}
 
     float eye(int i) {if(i >= 0 && i <= 2) return m_eye[i];}
+    const glm::vec4 getPosition() {return m_eye;}
     float at(int i) {if(i >= 0 && i <= 2) return m_at[i];}
+    const glm::vec4 getDestination() {return m_at;}
     float getUp(int i) {if(i >= 0 && i <= 2) return m_up[i];}
 
     // Incrementers
